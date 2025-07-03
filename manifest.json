@@ -1,0 +1,21 @@
+{
+  "name": "Superb Hyper Visitor Register",
+  "short_name": "Superb Visitors",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#2870ea",
+  "theme_color": "#2870ea",
+  "description": "Digital visitor register for Superb Hyper.",
+  "icons": [
+    {
+      "src": "assets/superb-logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/superb-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

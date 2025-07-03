@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Superb Hyper Visitor Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2870ea">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/superb-logo.png" sizes="192x192" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      background: linear-gradient(135deg, #2870ea 0%, #fff 70%, #e62739 100%);
+      color: #183d5c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 6px 32px 0 rgba(40,112,234,0.11), 0 1.5px 8px 0 rgba(40,112,234,0.07);
+      max-width: 410px;
+      width: 97vw;
+      margin: 32px;
+      padding: 36px 32px 24px 32px;
+      text-align: center;
+      transition: box-shadow 0.18s;
+    }
+    .container:focus-within, .container:hover {
+      box-shadow: 0 14px 44px 0 rgba(40,112,234,0.17), 0 2.5px 15px 0 rgba(230,39,57,0.13);
+    }
+    .logo-img {
+      width: 96px;
+      height: 96px;
+      margin-bottom: 18px;
+      border-radius: 16px;
+      box-shadow: 0 2px 18px rgba(40,112,234,0.11);
+      background: #fff;
+      object-fit: contain;
+    }
+    .logo {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #2870ea;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+      user-select: none;
+      margin-top: 0;
+    }
+    .subtitle {
+      font-size: 1.09rem;
+      font-weight: 500;
+      color: #1a2330;
+      margin-bottom: 18px;
+      opacity: 0.88;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 17px;
+    }
+    label {
+      text-align: left;
+      font-weight: 600;
+      color: #183d5c;
+      margin-bottom: 4px;
+      margin-top: 2px;
+      font-size: 1.01rem;
+      letter-spacing: 0.01em;
+      opacity: 0.98;
+    }
+    input, select, textarea {
+      padding: 11px 12px;
+      border: 1.2px solid #e2e6ef;
+      border-radius: 7px;
+      font-size: 1.06rem;
+      outline: none;
+      font-family: inherit;
+      background: #f8fafc;
+      transition: border 0.18s, box-shadow 0.18s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border: 1.2px solid #2870ea;
+      background: #fff;
+      box-shadow: 0 2px 10px #2870ea11;
+    }
+    button, .export-btn {
+      background: #2870ea;
+      color: #fff;
+      border: none;
+      padding: 12px 0;
+      border-radius: 7px;
+      font-size: 1.06rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 12px rgba(40,112,234,0.09);
+      margin-top: 9px;
+      transition: background 0.17s, box-shadow 0.17s, transform 0.14s;
+    }
+    button:hover, .export-btn:hover {
+      background: #e62739;
+      box-shadow: 0 4px 24px rgba(230,39,57,0.13);
+      color: #fff;
+      transform: translateY(-1.5px) scale(1.04);
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 0.98rem;
+      color: #a0a7bc;
+      user-select: none;
+      opacity: 0.93;
+    }
+    .success {
+      color: #23c181;
+      background: #e8f9f3;
+      border-radius: 7px;
+      padding: 8px 0 4px 0;
+      margin-bottom: 16px;
+      font-weight: 700;
+      display: none;
+      font-size: 1.07rem;
+      opacity: 0;
+      transform: scale(0.94);
+      border: 1px solid #23c18132;
+      box-shadow: 0 2px 9px #23c18118;
+      animation: popFade 0.56s cubic-bezier(.21,1.02,.73,1) forwards;
+    }
+    .success.show {
+      display: block;
+      animation: popFade 0.56s cubic-bezier(.21,1.02,.73,1) forwards;
+    }
+    @keyframes popFade {
+      from { opacity: 0; transform: scale(0.9);}
+      70%  { opacity: 1; transform: scale(1.06);}
+      to   { opacity: 1; transform: scale(1);}
+    }
+    .export-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 13px;
+      margin-top: 21px;
+      margin-bottom: 7px;
+    }
+    .export-btn {
+      background: #e62739;
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 7px;
+      font-size: 1.01rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, box-shadow 0.13s, transform 0.13s;
+      box-shadow: 0 1px 6px rgba(230,39,57,0.08);
+      position: relative;
+      z-index: 0;
+    }
+    .export-btn:hover {
+      background: #2870ea;
+      color: #fff;
+    }
+    @media (max-width: 500px) {
+      .container { padding: 13px 2.8vw 7px 2.8vw; }
+      .logo-img { width: 64px; height: 64px; margin-bottom: 12px; }
+      .logo { font-size: 1.16rem; }
+      .subtitle { font-size: 0.91rem; }
+      input, select, textarea { font-size: 0.98rem; }
+      button, .export-btn { font-size: 0.98rem; }
+      .export-buttons { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" tabindex="-1">
+    <img src="assets/superb-logo.png" alt="Superb Hyper Logo" class="logo-img" />
+    <div class="logo">Superb Hyper</div>
+    <div class="subtitle">Visitor Registration</div>
+    <div class="success" id="successMessage">Thank you for signing in. Please take a seat!</div>
+    <form id="visitorForm" autocomplete="off">
+      <div>
+        <label for="fullName">Full Name *</label>
+        <input type="text" id="fullName" name="fullName" required autofocus>
+      </div>
+      <div>
+        <label for="company">Company / Organisation</label>
+        <input type="text" id="company" name="company">
+      </div>
+      <div>
+        <label for="purpose">Purpose of Visit *</label>
+        <select id="purpose" name="purpose" required>
+          <option value="">Select purpose</option>
+          <option>Meeting</option>
+          <option>Delivery</option>
+          <option>Interview</option>
+          <option>Maintenance</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label for="contact">Contact Number *</label>
+        <input type="tel" id="contact" name="contact" pattern="[0-9+\-\s]+" required>
+      </div>
+      <div>
+        <label for="personToVisit">Person to Visit *</label>
+        <input type="text" id="personToVisit" name="personToVisit" required>
+      </div>
+      <div>
+        <label for="vehicle">Vehicle Registration</label>
+        <input type="text" id="vehicle" name="vehicle">
+      </div>
+      <div>
+        <label for="notes">Additional Notes</label>
+        <textarea id="notes" name="notes" rows="2"></textarea>
+      </div>
+      <button type="submit" id="signInBtn">Sign In</button>
+    </form>
+    <div class="export-buttons">
+      <button class="export-btn" id="exportCSV">Export CSV</button>
+      <button class="export-btn" id="exportPDF">Export PDF</button>
+    </div>
+    <div class="footer">&copy; 2025 Superb Hyper — Reception</div>
+  </div>
+  <script>
+    // ---- CONFIG ----
+    const API_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
+    const BIN_ID = '68669b0e8a456b7966babb15';
+    const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
+
+    // ---- FORM SUBMISSION ----
+    document.getElementById('visitorForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        fullName: form.fullName.value,
+        company: form.company.value,
+        purpose: form.purpose.value,
+        contact: form.contact.value,
+        personToVisit: form.personToVisit.value,
+        vehicle: form.vehicle.value,
+        notes: form.notes.value,
+        timestamp: new Date().toISOString()
+      };
+
+      // 1. Get the latest array of entries from the bin
+      let entries = [];
+      try {
+        const res = await fetch(API_URL, {
+          headers: { "X-Master-Key": API_KEY }
+        });
+        if (res.ok) {
+          const json = await res.json();
+          entries = Array.isArray(json.record) ? json.record : [];
+        }
+      } catch (err) {
+        entries = [];
+      }
+
+      // 2. Add the new entry
+      entries.push(data);
+
+      // 3. Update bin with the new array
+      const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key": API_KEY
+        },
+        body: JSON.stringify(entries)
+      });
+
+      if (updateRes.ok) {
+        form.reset();
+        const successMsg = document.getElementById('successMessage');
+        successMsg.classList.add('show');
+        setTimeout(() => {
+          successMsg.classList.remove('show');
+        }, 3200);
+      } else {
+        alert("Error saving your details. Please try again.");
+      }
+    };
+
+    // ---- EXPORT CSV ----
+    document.getElementById('exportCSV').onclick = async function() {
+      const res = await fetch(API_URL, {
+        headers: { "X-Master-Key": API_KEY }
+      });
+      const json = await res.json();
+      const data = Array.isArray(json.record) ? json.record : [];
+      if (data.length === 0) {
+        alert("No visitor records to export.");
+        return;
+      }
+
+      const fields = ["timestamp","fullName", "company", "purpose", "contact", "personToVisit", "vehicle", "notes"];
+      const csv = [
+        fields.map(f => `"${f.replace(/"/g, '""')}"`).join(","),
+        ...data.map(row =>
+          fields.map(field => `"${(row[field] || "").toString().replace(/"/g, '""')}"`).join(",")
+        )
+      ].join("\r\n");
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "superb_visitors.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+
+    // ---- EXPORT PDF ----
+    document.getElementById('exportPDF').onclick = async function() {
+      const res = await fetch(API_URL, {
+        headers: { "X-Master-Key": API_KEY }
+      });
+      const json = await res.json();
+      const data = Array.isArray(json.record) ? json.record : [];
+      if (data.length === 0) {
+        alert("No visitor records to export.");
+        return;
+      }
+
+      // Format the date nicely for the PDF
+      const shortDate = (iso) => {
+        const d = new Date(iso);
+        if (isNaN(d)) return "";
+        return (
+          d.getFullYear() +
+          "-" +
+          String(d.getMonth() + 1).padStart(2, "0") +
+          "-" +
+          String(d.getDate()).padStart(2, "0") +
+          " " +
+          String(d.getHours()).padStart(2, "0") +
+          ":" +
+          String(d.getMinutes()).padStart(2, "0")
+        );
+      };
+
+      // Prepare table data for PDF
+      const fields = ["timestamp", "fullName", "company", "purpose", "contact", "personToVisit", "vehicle", "notes"];
+      const fieldNames = ["Date/Time", "Full Name", "Company", "Purpose", "Contact", "Person to Visit", "Vehicle", "Notes"];
+      const rows = [fieldNames].concat(
+        data.map(row => [
+          shortDate(row.timestamp),
+          row.fullName || "",
+          row.company || "",
+          row.purpose || "",
+          row.contact || "",
+          row.personToVisit || "",
+          row.vehicle || "",
+          row.notes || ""
+        ])
+      );
+
+      // Generate PDF using jsPDF
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "landscape" });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      doc.setFontSize(16);
+      doc.text("Superb Hyper - Visitor Log", pageWidth/2, 14, { align: "center" });
+      doc.setFontSize(10);
+
+      // Table rendering - adjust column widths
+      let startY = 22;
+      const colWidths = [48, 38, 36, 30, 34, 40, 33, 48];
+      rows.forEach((row, i) => {
+        let x = 8;
+        row.forEach((cell, j) => {
+          let text = String(cell);
+          if (text.length > 26) text = text.slice(0, 23) + "..."; // truncate long fields
+          doc.text(text, x, startY + i * 8);
+          x += colWidths[j];
+        });
+      });
+
+      doc.save("superb_visitors.pdf");
+    };
+
+    // ---- Register service worker for PWA ----
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
+</body>
+</html>
