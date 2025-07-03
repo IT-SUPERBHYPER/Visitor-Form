@@ -34,20 +34,11 @@
     .container:focus-within, .container:hover {
       box-shadow: 0 14px 44px 0 rgba(40,112,234,0.17), 0 2.5px 15px 0 rgba(230,39,57,0.13);
     }
-    .logo-img {
-      width: 96px;
-      height: 96px;
-      margin-bottom: 18px;
-      border-radius: 16px;
-      box-shadow: 0 2px 18px rgba(40,112,234,0.11);
-      background: #fff;
-      object-fit: contain;
-    }
     .logo {
       font-size: 2rem;
       font-weight: 900;
       color: #2870ea;
-      margin-bottom: 4px;
+      margin-bottom: 12px;
       letter-spacing: 1px;
       user-select: none;
       margin-top: 0;
@@ -166,7 +157,6 @@
     }
     @media (max-width: 500px) {
       .container { padding: 13px 2.8vw 7px 2.8vw; }
-      .logo-img { width: 64px; height: 64px; margin-bottom: 12px; }
       .logo { font-size: 1.16rem; }
       .subtitle { font-size: 0.91rem; }
       input, select, textarea { font-size: 0.98rem; }
@@ -177,7 +167,6 @@
 </head>
 <body>
   <div class="container" tabindex="-1">
-    <img src="assets/superb-logo.png" alt="Superb Hyper Logo" class="logo-img" />
     <div class="logo">Superb Hyper</div>
     <div class="subtitle">Visitor Registration</div>
     <div class="success" id="successMessage">Thank you for signing in. Please take a seat!</div>
