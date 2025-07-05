@@ -215,6 +215,20 @@
     <div class="footer">&copy; 2025 Superb Hyper — Reception</div>
   </div>
   <script>
+    // ---- South Africa Time Helper ----
+    function getSouthAfricaISO(date = new Date()) {
+      // South Africa is always UTC+2, no daylight saving
+      const tzOffset = 2 * 60; // minutes
+      // Get UTC time and add offset
+      const local = new Date(date.getTime() + (tzOffset - date.getTimezoneOffset()) * 60000);
+      return local.getFullYear() + '-' +
+        String(local.getMonth() + 1).padStart(2, '0') + '-' +
+        String(local.getDate()).padStart(2, '0') + 'T' +
+        String(local.getHours()).padStart(2, '0') + ':' +
+        String(local.getMinutes()).padStart(2, '0') + ':' +
+        String(local.getSeconds()).padStart(2, '0');
+    }
+
     // ---- CONFIG ----
     const API_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
     const BIN_ID = '68669b0e8a456b7966babb15';
@@ -232,7 +246,7 @@
         personToVisit: form.personToVisit.value,
         vehicle: form.vehicle.value,
         notes: form.notes.value,
-        timestamp: new Date().toISOString()
+        timestamp: getSouthAfricaISO()
       };
 
       // 1. Get the latest array of entries from the bin
@@ -307,6 +321,31 @@
     };
 
     // ---- EXPORT PDF ----
+    // Format a timestamp string in South Africa time for PDF export
+    function shortDate(iso) {
+      if (!iso) return "";
+      // Parse as if it's already UTC+2 (South Africa)
+      const parts = iso.split(/[-T:]/);
+      if (parts.length < 6) return iso;
+      // Convert to a Date object
+      const date = new Date(
+        parseInt(parts[0]),      // year
+        parseInt(parts[1]) - 1,  // month
+        parseInt(parts[2]),      // day
+        parseInt(parts[3]),      // hour
+        parseInt(parts[4]),      // min
+        parseInt(parts[5])       // sec
+      );
+      // Output as "YYYY-MM-DD HH:MM"
+      return (
+        date.getFullYear() + "-" +
+        String(date.getMonth() + 1).padStart(2, "0") + "-" +
+        String(date.getDate()).padStart(2, "0") + " " +
+        String(date.getHours()).padStart(2, "0") + ":" +
+        String(date.getMinutes()).padStart(2, "0")
+      );
+    }
+
     document.getElementById('exportPDF').onclick = async function() {
       const res = await fetch(API_URL, {
         headers: { "X-Master-Key": API_KEY }
@@ -317,23 +356,6 @@
         alert("No visitor records to export.");
         return;
       }
-
-      // Format the date nicely for the PDF
-      const shortDate = (iso) => {
-        const d = new Date(iso);
-        if (isNaN(d)) return "";
-        return (
-          d.getFullYear() +
-          "-" +
-          String(d.getMonth() + 1).padStart(2, "0") +
-          "-" +
-          String(d.getDate()).padStart(2, "0") +
-          " " +
-          String(d.getHours()).padStart(2, "0") +
-          ":" +
-          String(d.getMinutes()).padStart(2, "0")
-        );
-      };
 
       // Prepare table data for PDF
       const fields = ["timestamp", "fullName", "company", "purpose", "contact", "personToVisit", "vehicle", "notes"];
