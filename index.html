@@ -216,17 +216,21 @@
   </div>
   <script>
     // ---- South Africa Time Helper ----
-    function getSouthAfricaISO(date = new Date()) {
-      // South Africa is always UTC+2, no daylight saving
-      const tzOffset = 2 * 60; // minutes
-      // Get UTC time and add offset
-      const local = new Date(date.getTime() + (tzOffset - date.getTimezoneOffset()) * 60000);
-      return local.getFullYear() + '-' +
-        String(local.getMonth() + 1).padStart(2, '0') + '-' +
-        String(local.getDate()).padStart(2, '0') + 'T' +
-        String(local.getHours()).padStart(2, '0') + ':' +
-        String(local.getMinutes()).padStart(2, '0') + ':' +
-        String(local.getSeconds()).padStart(2, '0');
+    // Always gets the current time in UTC+2 (South Africa) as an ISO string
+    function getSouthAfricaISO() {
+      // Get current UTC time
+      const now = new Date();
+      // Add 2 hours for South Africa time
+      const saTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+      // Format as "YYYY-MM-DDTHH:MM:SS"
+      return (
+        saTime.getUTCFullYear() + "-" +
+        String(saTime.getUTCMonth() + 1).padStart(2, '0') + "-" +
+        String(saTime.getUTCDate()).padStart(2, '0') + "T" +
+        String(saTime.getUTCHours()).padStart(2, '0') + ":" +
+        String(saTime.getUTCMinutes()).padStart(2, '0') + ":" +
+        String(saTime.getUTCSeconds()).padStart(2, '0')
+      );
     }
 
     // ---- CONFIG ----
@@ -321,28 +325,28 @@
     };
 
     // ---- EXPORT PDF ----
-    // Format a timestamp string in South Africa time for PDF export
+    // Parse timestamp and show as South Africa time (even if browser is not in +2)
     function shortDate(iso) {
       if (!iso) return "";
-      // Parse as if it's already UTC+2 (South Africa)
       const parts = iso.split(/[-T:]/);
       if (parts.length < 6) return iso;
-      // Convert to a Date object
-      const date = new Date(
-        parseInt(parts[0]),      // year
-        parseInt(parts[1]) - 1,  // month
-        parseInt(parts[2]),      // day
-        parseInt(parts[3]),      // hour
-        parseInt(parts[4]),      // min
-        parseInt(parts[5])       // sec
+      // Parse as UTC, then display as UTC+2 (SA)
+      const utc = Date.UTC(
+        parseInt(parts[0]),
+        parseInt(parts[1]) - 1,
+        parseInt(parts[2]),
+        parseInt(parts[3]),
+        parseInt(parts[4]),
+        parseInt(parts[5])
       );
-      // Output as "YYYY-MM-DD HH:MM"
+      const saTime = new Date(utc + 2 * 60 * 60 * 1000);
+      // "YYYY-MM-DD HH:MM"
       return (
-        date.getFullYear() + "-" +
-        String(date.getMonth() + 1).padStart(2, "0") + "-" +
-        String(date.getDate()).padStart(2, "0") + " " +
-        String(date.getHours()).padStart(2, "0") + ":" +
-        String(date.getMinutes()).padStart(2, "0")
+        saTime.getUTCFullYear() + "-" +
+        String(saTime.getUTCMonth() + 1).padStart(2, "0") + "-" +
+        String(saTime.getUTCDate()).padStart(2, "0") + " " +
+        String(saTime.getUTCHours()).padStart(2, "0") + ":" +
+        String(saTime.getUTCMinutes()).padStart(2, "0")
       );
     }
 
