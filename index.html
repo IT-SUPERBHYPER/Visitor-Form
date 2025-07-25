@@ -9,6 +9,7 @@
   <link rel="icon" href="assets/superb-logo.png" sizes="192x192" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <style>
     body {
       min-height: 100vh;
@@ -233,6 +234,31 @@
       );
     }
 
+    // Parse timestamp and show as South Africa time (even if browser is not in +2)
+    function shortDate(iso) {
+      if (!iso) return "";
+      const parts = iso.split(/[-T:]/);
+      if (parts.length < 6) return iso;
+      // Parse as UTC, then display as UTC+2 (SA)
+      const utc = Date.UTC(
+        parseInt(parts[0]),
+        parseInt(parts[1]) - 1,
+        parseInt(parts[2]),
+        parseInt(parts[3]),
+        parseInt(parts[4]),
+        parseInt(parts[5])
+      );
+      const saTime = new Date(utc + 2 * 60 * 60 * 1000);
+      // "YYYY-MM-DD HH:MM"
+      return (
+        saTime.getUTCFullYear() + "-" +
+        String(saTime.getUTCMonth() + 1).padStart(2, "0") + "-" +
+        String(saTime.getUTCDate()).padStart(2, "0") + " " +
+        String(saTime.getUTCHours()).padStart(2, "0") + ":" +
+        String(saTime.getUTCMinutes()).padStart(2, "0")
+      );
+    }
+
     // ---- CONFIG ----
     const API_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
     const BIN_ID = '68669b0e8a456b7966babb15';
@@ -308,7 +334,14 @@
       const csv = [
         fields.map(f => `"${f.replace(/"/g, '""')}"`).join(","),
         ...data.map(row =>
-          fields.map(field => `"${(row[field] || "").toString().replace(/"/g, '""')}"`).join(",")
+          fields.map(field => {
+            let value = row[field] || "";
+            // Apply shortDate formatting to the timestamp field for consistency
+            if (field === "timestamp") {
+              value = shortDate(value);
+            }
+            return `"${value.toString().replace(/"/g, '""')}"`;
+          }).join(",")
         )
       ].join("\r\n");
 
@@ -325,31 +358,6 @@
     };
 
     // ---- EXPORT PDF ----
-    // Parse timestamp and show as South Africa time (even if browser is not in +2)
-    function shortDate(iso) {
-      if (!iso) return "";
-      const parts = iso.split(/[-T:]/);
-      if (parts.length < 6) return iso;
-      // Parse as UTC, then display as UTC+2 (SA)
-      const utc = Date.UTC(
-        parseInt(parts[0]),
-        parseInt(parts[1]) - 1,
-        parseInt(parts[2]),
-        parseInt(parts[3]),
-        parseInt(parts[4]),
-        parseInt(parts[5])
-      );
-      const saTime = new Date(utc + 2 * 60 * 60 * 1000);
-      // "YYYY-MM-DD HH:MM"
-      return (
-        saTime.getUTCFullYear() + "-" +
-        String(saTime.getUTCMonth() + 1).padStart(2, "0") + "-" +
-        String(saTime.getUTCDate()).padStart(2, "0") + " " +
-        String(saTime.getUTCHours()).padStart(2, "0") + ":" +
-        String(saTime.getUTCMinutes()).padStart(2, "0")
-      );
-    }
-
     document.getElementById('exportPDF').onclick = async function() {
       const res = await fetch(API_URL, {
         headers: { "X-Master-Key": API_KEY }
@@ -364,8 +372,7 @@
       // Prepare table data for PDF
       const fields = ["timestamp", "fullName", "company", "purpose", "contact", "personToVisit", "vehicle", "notes"];
       const fieldNames = ["Date/Time", "Full Name", "Company", "Purpose", "Contact", "Person to Visit", "Vehicle", "Notes"];
-      const rows = [fieldNames].concat(
-        data.map(row => [
+      const rows = data.map(row => [
           shortDate(row.timestamp),
           row.fullName || "",
           row.company || "",
@@ -374,8 +381,7 @@
           row.personToVisit || "",
           row.vehicle || "",
           row.notes || ""
-        ])
-      );
+      ]);
 
       // Generate PDF using jsPDF
       const { jsPDF } = window.jspdf;
@@ -385,17 +391,36 @@
       doc.text("Superb Hyper - Visitor Log", pageWidth/2, 14, { align: "center" });
       doc.setFontSize(10);
 
-      // Table rendering - adjust column widths
-      let startY = 22;
-      const colWidths = [48, 38, 36, 30, 34, 40, 33, 48];
-      rows.forEach((row, i) => {
-        let x = 8;
-        row.forEach((cell, j) => {
-          let text = String(cell);
-          if (text.length > 26) text = text.slice(0, 23) + "..."; // truncate long fields
-          doc.text(text, x, startY + i * 8);
-          x += colWidths[j];
-        });
+      // Table rendering with jsPDF-AutoTable
+      doc.autoTable({
+        head: [fieldNames],
+        body: rows,
+        startY: 22,
+        theme: 'grid',
+        styles: {
+          fontSize: 8,
+          cellPadding: 1,
+          overflow: 'linebreak', // Allow text to wrap
+          valign: 'top'
+        },
+        columnStyles: {
+            0: { cellWidth: 38 }, // Date/Time
+            1: { cellWidth: 38 }, // Full Name
+            2: { cellWidth: 36 }, // Company
+            3: { cellWidth: 30 }, // Purpose
+            4: { cellWidth: 34 }, // Contact
+            5: { cellWidth: 40 }, // Person to Visit
+            6: { cellWidth: 33 }, // Vehicle
+            7: { cellWidth: 48 }  // Notes
+        },
+        headStyles: {
+            fillColor: [40, 112, 234], // Blue header
+            textColor: [255, 255, 255],
+            fontStyle: 'bold'
+        },
+        alternateRowStyles: {
+            fillColor: [248, 250, 252] // Light grey for alternate rows
+        }
       });
 
       doc.save("superb_visitors.pdf");
