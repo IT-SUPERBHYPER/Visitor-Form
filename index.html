@@ -156,6 +156,112 @@
       background: #2870ea;
       color: #fff;
     }
+    .export-modal, .password-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .export-modal-content, .password-modal-content {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 5px 30px rgba(0,0,0,0.2);
+    }
+    .export-modal h3, .password-modal h3 {
+      margin-top: 0;
+      color: #183d5c;
+    }
+    .date-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .date-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .date-option input {
+      width: auto;
+      margin: 0;
+    }
+    .custom-date {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+      padding: 15px;
+      background: #f8fafc;
+      border-radius: 7px;
+    }
+    .custom-date.active {
+      display: flex;
+    }
+    .date-option input[type="date"] {
+      padding: 8px;
+      font-size: 0.95rem;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+    .modal-btn {
+      padding: 10px 20px;
+      border-radius: 7px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .modal-cancel {
+      background: #f0f2f5;
+      color: #5a6474;
+    }
+    .modal-export {
+      background: #2870ea;
+      color: white;
+    }
+    .modal-export:hover {
+      background: #e62739;
+      transform: none;
+      box-shadow: none;
+    }
+    .password-input {
+      width: 100%;
+      padding: 10px;
+      margin: 15px 0;
+      border: 1.2px solid #e2e6ef;
+      border-radius: 7px;
+      font-size: 1rem;
+    }
+    .password-error {
+      color: #e62739;
+      font-size: 0.9rem;
+      margin-top: 5px;
+      display: none;
+    }
+    @media (max-width: 500px) {
+      .export-modal-content, .password-modal-content {
+        padding: 20px 15px;
+      }
+      .modal-buttons {
+        flex-direction: column;
+      }
+      .modal-btn {
+        width: 100%;
+      }
+    }
     @media (max-width: 500px) {
       .container { padding: 13px 2.8vw 7px 2.8vw; }
       .logo { font-size: 1.16rem; }
@@ -215,15 +321,61 @@
     </div>
     <div class="footer">&copy; 2025 Superb Hyper — Reception</div>
   </div>
+  
+  <!-- Export Modal -->
+  <div class="export-modal" id="exportModal">
+    <div class="export-modal-content">
+      <h3>Export Options</h3>
+      <div class="date-options">
+        <div class="date-option">
+          <input type="radio" id="allTime" name="dateRange" value="all" checked>
+          <label for="allTime">All Data</label>
+        </div>
+        <div class="date-option">
+          <input type="radio" id="monthToDate" name="dateRange" value="month">
+          <label for="monthToDate">Month to Date</label>
+        </div>
+        <div class="date-option">
+          <input type="radio" id="lifeToDate" name="dateRange" value="life">
+          <label for="lifeToDate">Life to Date</label>
+        </div>
+        <div class="date-option">
+          <input type="radio" id="customRange" name="dateRange" value="custom">
+          <label for="customRange">Custom Range</label>
+        </div>
+        <div class="custom-date" id="customDateFields">
+          <label for="startDate">Start Date:</label>
+          <input type="date" id="startDate">
+          <label for="endDate">End Date:</label>
+          <input type="date" id="endDate">
+        </div>
+      </div>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-cancel" id="cancelExport">Cancel</button>
+        <button class="modal-btn modal-export" id="confirmExport">Export</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password Modal -->
+  <div class="password-modal" id="passwordModal">
+    <div class="password-modal-content">
+      <h3>Admin Authentication</h3>
+      <p>Please enter the admin password to proceed with export</p>
+      <input type="password" id="adminPassword" class="password-input" placeholder="Enter password">
+      <div class="password-error" id="passwordError">Incorrect password. Please try again.</div>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-cancel" id="cancelPassword">Cancel</button>
+        <button class="modal-btn modal-export" id="confirmPassword">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ---- South Africa Time Helper ----
-    // Always gets the current time in UTC+2 (South Africa) as an ISO string
     function getSouthAfricaISO() {
-      // Get current UTC time
       const now = new Date();
-      // Add 2 hours for South Africa time
       const saTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-      // Format as "YYYY-MM-DDTHH:MM:SS"
       return (
         saTime.getUTCFullYear() + "-" +
         String(saTime.getUTCMonth() + 1).padStart(2, '0') + "-" +
@@ -234,12 +386,10 @@
       );
     }
 
-    // Parse timestamp and show as South Africa time (even if browser is not in +2)
     function shortDate(iso) {
       if (!iso) return "";
       const parts = iso.split(/[-T:]/);
       if (parts.length < 6) return iso;
-      // Parse as UTC, then display as UTC+2 (SA)
       const utc = Date.UTC(
         parseInt(parts[0]),
         parseInt(parts[1]) - 1,
@@ -249,7 +399,6 @@
         parseInt(parts[5])
       );
       const saTime = new Date(utc + 2 * 60 * 60 * 1000);
-      // "YYYY-MM-DD HH:MM"
       return (
         saTime.getUTCFullYear() + "-" +
         String(saTime.getUTCMonth() + 1).padStart(2, "0") + "-" +
@@ -263,80 +412,43 @@
     const API_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
     const BIN_ID = '68669b0e8a456b7966babb15';
     const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
+    const ADMIN_PASSWORD = 'Superb@123';
 
-    // ---- FORM SUBMISSION ----
-    document.getElementById('visitorForm').onsubmit = async function(e) {
-      e.preventDefault();
-      const form = e.target;
-      const data = {
-        fullName: form.fullName.value,
-        company: form.company.value,
-        purpose: form.purpose.value,
-        contact: form.contact.value,
-        personToVisit: form.personToVisit.value,
-        vehicle: form.vehicle.value,
-        notes: form.notes.value,
-        timestamp: getSouthAfricaISO()
-      };
-
-      // 1. Get the latest array of entries from the bin
-      let entries = [];
-      try {
-        const res = await fetch(API_URL, {
-          headers: { "X-Master-Key": API_KEY }
-        });
-        if (res.ok) {
-          const json = await res.json();
-          entries = Array.isArray(json.record) ? json.record : [];
+    // ---- DATE FILTERING ----
+    function filterDataByRange(data, rangeType, startDate = null, endDate = null) {
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      
+      return data.filter(entry => {
+        if (!entry.timestamp) return false;
+        const entryDate = new Date(entry.timestamp);
+        
+        switch(rangeType) {
+          case 'month':
+            return entryDate >= startOfMonth;
+          case 'life':
+            return entryDate >= startOfYear;
+          case 'custom':
+            if (!startDate || !endDate) return true;
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999);
+            return entryDate >= start && entryDate <= end;
+          default:
+            return true;
         }
-      } catch (err) {
-        entries = [];
-      }
-
-      // 2. Add the new entry
-      entries.push(data);
-
-      // 3. Update bin with the new array
-      const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Master-Key": API_KEY
-        },
-        body: JSON.stringify(entries)
       });
+    }
 
-      if (updateRes.ok) {
-        form.reset();
-        const successMsg = document.getElementById('successMessage');
-        successMsg.classList.add('show');
-        setTimeout(() => {
-          successMsg.classList.remove('show');
-        }, 3200);
-      } else {
-        alert("Error saving your details. Please try again.");
-      }
-    };
-
-    // ---- EXPORT CSV ----
-    document.getElementById('exportCSV').onclick = async function() {
-      const res = await fetch(API_URL, {
-        headers: { "X-Master-Key": API_KEY }
-      });
-      const json = await res.json();
-      const data = Array.isArray(json.record) ? json.record : [];
-      if (data.length === 0) {
-        alert("No visitor records to export.");
-        return;
-      }
-
+    // ---- EXPORT FUNCTIONS ----
+    function exportToCSV(data) {
       const fields = ["timestamp","fullName", "company", "purpose", "contact", "personToVisit", "vehicle", "notes"];
       const csv = [
         fields.map(f => `"${f.replace(/"/g, '""')}"`).join(","),
         ...data.map(row =>
           fields.map(field => {
             let value = row[field] || "";
-            // Apply shortDate formatting to the timestamp field for consistency
             if (field === "timestamp") {
               value = shortDate(value);
             }
@@ -347,29 +459,16 @@
 
       const blob = new Blob([csv], { type: "text/csv" });
       const url = URL.createObjectURL(blob);
-
       const a = document.createElement("a");
       a.href = url;
-      a.download = "superb_visitors.csv";
+      a.download = `superb_visitors_${new Date().toISOString().slice(0,10)}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    };
+    }
 
-    // ---- EXPORT PDF ----
-    document.getElementById('exportPDF').onclick = async function() {
-      const res = await fetch(API_URL, {
-        headers: { "X-Master-Key": API_KEY }
-      });
-      const json = await res.json();
-      const data = Array.isArray(json.record) ? json.record : [];
-      if (data.length === 0) {
-        alert("No visitor records to export.");
-        return;
-      }
-
-      // Prepare table data for PDF
+    function exportToPDF(data) {
       const fields = ["timestamp", "fullName", "company", "purpose", "contact", "personToVisit", "vehicle", "notes"];
       const fieldNames = ["Date/Time", "Full Name", "Company", "Purpose", "Contact", "Person to Visit", "Vehicle", "Notes"];
       const rows = data.map(row => [
@@ -383,7 +482,6 @@
           row.notes || ""
       ]);
 
-      // Generate PDF using jsPDF
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "landscape" });
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -391,7 +489,6 @@
       doc.text("Superb Hyper - Visitor Log", pageWidth/2, 14, { align: "center" });
       doc.setFontSize(10);
 
-      // Table rendering with jsPDF-AutoTable
       doc.autoTable({
         head: [fieldNames],
         body: rows,
@@ -400,31 +497,205 @@
         styles: {
           fontSize: 8,
           cellPadding: 1,
-          overflow: 'linebreak', // Allow text to wrap
+          overflow: 'linebreak',
           valign: 'top'
         },
         columnStyles: {
-            0: { cellWidth: 38 }, // Date/Time
-            1: { cellWidth: 38 }, // Full Name
-            2: { cellWidth: 36 }, // Company
-            3: { cellWidth: 30 }, // Purpose
-            4: { cellWidth: 34 }, // Contact
-            5: { cellWidth: 40 }, // Person to Visit
-            6: { cellWidth: 33 }, // Vehicle
-            7: { cellWidth: 48 }  // Notes
+            0: { cellWidth: 38 },
+            1: { cellWidth: 38 },
+            2: { cellWidth: 36 },
+            3: { cellWidth: 30 },
+            4: { cellWidth: 34 },
+            5: { cellWidth: 40 },
+            6: { cellWidth: 33 },
+            7: { cellWidth: 48 }
         },
         headStyles: {
-            fillColor: [40, 112, 234], // Blue header
+            fillColor: [40, 112, 234],
             textColor: [255, 255, 255],
             fontStyle: 'bold'
         },
         alternateRowStyles: {
-            fillColor: [248, 250, 252] // Light grey for alternate rows
+            fillColor: [248, 250, 252]
         }
       });
 
-      doc.save("superb_visitors.pdf");
-    };
+      doc.save(`superb_visitors_${new Date().toISOString().slice(0,10)}.pdf`);
+    }
+
+    // ---- EVENT HANDLERS ----
+    document.addEventListener('DOMContentLoaded', function() {
+      // Form submission
+      document.getElementById('visitorForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const data = {
+          fullName: form.fullName.value,
+          company: form.company.value,
+          purpose: form.purpose.value,
+          contact: form.contact.value,
+          personToVisit: form.personToVisit.value,
+          vehicle: form.vehicle.value,
+          notes: form.notes.value,
+          timestamp: getSouthAfricaISO()
+        };
+
+        let entries = [];
+        try {
+          const res = await fetch(API_URL, {
+            headers: { "X-Master-Key": API_KEY }
+          });
+          if (res.ok) {
+            const json = await res.json();
+            entries = Array.isArray(json.record) ? json.record : [];
+          }
+        } catch (err) {
+          entries = [];
+        }
+
+        entries.push(data);
+
+        const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Master-Key": API_KEY
+          },
+          body: JSON.stringify(entries)
+        });
+
+        if (updateRes.ok) {
+          form.reset();
+          const successMsg = document.getElementById('successMessage');
+          successMsg.classList.add('show');
+          setTimeout(() => {
+            successMsg.classList.remove('show');
+          }, 3200);
+        } else {
+          alert("Error saving your details. Please try again.");
+        }
+      };
+
+      // ---- MODAL ELEMENTS ----
+      const exportModal = document.getElementById('exportModal');
+      const passwordModal = document.getElementById('passwordModal');
+      const customDateFields = document.getElementById('customDateFields');
+      const passwordError = document.getElementById('passwordError');
+      const adminPasswordInput = document.getElementById('adminPassword');
+      
+      // ---- PASSWORD PROTECTION ----
+      let exportFormat = '';
+      
+      // Show password modal when export is initiated
+      document.getElementById('exportCSV').onclick = () => {
+        exportFormat = 'csv';
+        passwordModal.style.display = 'flex';
+        adminPasswordInput.value = '';
+        passwordError.style.display = 'none';
+        adminPasswordInput.focus();
+      };
+      
+      document.getElementById('exportPDF').onclick = () => {
+        exportFormat = 'pdf';
+        passwordModal.style.display = 'flex';
+        adminPasswordInput.value = '';
+        passwordError.style.display = 'none';
+        adminPasswordInput.focus();
+      };
+      
+      // Handle password confirmation
+      document.getElementById('confirmPassword').onclick = async () => {
+        const enteredPassword = adminPasswordInput.value;
+        if (enteredPassword === ADMIN_PASSWORD) {
+          passwordModal.style.display = 'none';
+          exportModal.style.display = 'flex';
+        } else {
+          passwordError.style.display = 'block';
+          adminPasswordInput.value = '';
+          adminPasswordInput.focus();
+        }
+      };
+      
+      // Cancel password modal
+      document.getElementById('cancelPassword').onclick = () => {
+        passwordModal.style.display = 'none';
+      };
+      
+      // Allow Enter key in password field
+      adminPasswordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          document.getElementById('confirmPassword').click();
+        }
+      });
+      
+      // ---- DATE RANGE OPTIONS ----
+      document.getElementById('customRange').onchange = () => {
+        customDateFields.classList.add('active');
+      };
+      
+      document.querySelectorAll('input[name="dateRange"]').forEach(input => {
+        if (input.value !== 'custom') {
+          input.onchange = () => {
+            customDateFields.classList.remove('active');
+          };
+        }
+      });
+
+      // ---- EXPORT CONFIRMATION ----
+      document.getElementById('confirmExport').onclick = async () => {
+        const selectedRange = document.querySelector('input[name="dateRange"]:checked').value;
+        let startDate = null;
+        let endDate = null;
+        
+        if (selectedRange === 'custom') {
+          startDate = document.getElementById('startDate').value;
+          endDate = document.getElementById('endDate').value;
+          if (!startDate || !endDate) {
+            alert('Please select both start and end dates');
+            return;
+          }
+        }
+        
+        // Fetch data
+        const res = await fetch(API_URL, {
+          headers: { "X-Master-Key": API_KEY }
+        });
+        const json = await res.json();
+        let data = Array.isArray(json.record) ? json.record : [];
+        
+        // Apply filtering
+        data = filterDataByRange(data, selectedRange, startDate, endDate);
+        
+        if (data.length === 0) {
+          alert("No visitor records match the selected criteria.");
+          return;
+        }
+        
+        // Export based on format
+        if (exportFormat === 'csv') {
+          exportToCSV(data);
+        } else {
+          exportToPDF(data);
+        }
+        
+        exportModal.style.display = 'none';
+      };
+
+      // ---- MODAL CANCEL BUTTONS ----
+      document.getElementById('cancelExport').onclick = () => {
+        exportModal.style.display = 'none';
+      };
+
+      // Close modals when clicking outside
+      window.onclick = function(event) {
+        if (event.target === exportModal) {
+          exportModal.style.display = 'none';
+        }
+        if (event.target === passwordModal) {
+          passwordModal.style.display = 'none';
+        }
+      };
+    });
 
     // ---- Register service worker for PWA ----
     if ('serviceWorker' in navigator) {
