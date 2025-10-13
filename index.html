@@ -11,6 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
     body {
       min-height: 100vh;
@@ -157,7 +160,7 @@
       background: #2870ea;
       color: #fff;
     }
-    .export-modal, .password-modal {
+    .export-modal, .password-modal, .migration-modal {
       display: none;
       position: fixed;
       top: 0;
@@ -169,7 +172,7 @@
       justify-content: center;
       align-items: center;
     }
-    .export-modal-content, .password-modal-content {
+    .export-modal-content, .password-modal-content, .migration-modal-content {
       background: white;
       border-radius: 10px;
       padding: 25px;
@@ -177,7 +180,7 @@
       max-width: 400px;
       box-shadow: 0 5px 30px rgba(0,0,0,0.2);
     }
-    .export-modal h3, .password-modal h3 {
+    .export-modal h3, .password-modal h3, .migration-modal h3 {
       margin-top: 0;
       color: #183d5c;
     }
@@ -252,8 +255,24 @@
       margin-top: 5px;
       display: none;
     }
+    .migration-status {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 7px;
+      font-weight: 600;
+    }
+    .migration-success {
+      background: #e8f9f3;
+      color: #23c181;
+      display: none;
+    }
+    .migration-error {
+      background: #fff1f0;
+      color: #e62739;
+      display: none;
+    }
     @media (max-width: 500px) {
-      .export-modal-content, .password-modal-content {
+      .export-modal-content, .password-modal-content, .migration-modal-content {
         padding: 20px 15px;
       }
       .modal-buttons {
@@ -270,6 +289,31 @@
       input, select, textarea { font-size: 0.98rem; }
       button, .export-btn { font-size: 0.98rem; }
       .export-buttons { flex-direction: column; gap: 8px; }
+    }
+    /* Loading indicator */
+    .loading {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.8);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #2870ea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -372,7 +416,47 @@
     </div>
   </div>
 
+  <!-- Migration Modal -->
+  <div class="migration-modal" id="migrationModal">
+    <div class="migration-modal-content">
+      <h3>Data Migration</h3>
+      <p>This will migrate all existing visitor data from JSONBin to Firebase.</p>
+      <p><strong>Warning:</strong> This should only be done once!</p>
+      <div class="migration-status migration-success" id="migrationSuccess">Migration completed successfully!</div>
+      <div class="migration-status migration-error" id="migrationError">Migration failed. Please try again.</div>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-cancel" id="cancelMigration">Cancel</button>
+        <button class="modal-btn modal-export" id="confirmMigration">Migrate Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div class="loading" id="loadingIndicator">
+    <div class="spinner"></div>
+  </div>
+
   <script>
+    // ---- Firebase Configuration ----
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3HcG5FIr_5hQDKOzrKuEGZNA4EQeu2HU",
+      authDomain: "visitor-form-f6ae9.firebaseapp.com",
+      projectId: "visitor-form-f6ae9",
+      storageBucket: "visitor-form-f6ae9.firebasestorage.app",
+      messagingSenderId: "140839989587",
+      appId: "1:140839989587:web:63e4f2add9eeedaa0431a6",
+      measurementId: "G-VLP8XN6XE6"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ---- JSONBin Configuration ----
+    const API_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
+    const BIN_ID = '68669b0e8a456b7966babb15';
+    const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
+
     // ---- South Africa Time Helper ----
     function getSouthAfricaISO() {
       const now = new Date();
@@ -410,66 +494,17 @@
     }
 
     // ---- CONFIG ----
-    // NOTE: Using localStorage as a fallback when API is unavailable
-    const API_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
-    const BIN_ID = '68669b0e8a456b7966babb15';
-    const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
     const ADMIN_PASSWORD = 'Superb@123';
-    const LOCAL_STORAGE_KEY = 'superb_visitor_data';
+    const COLLECTION_NAME = 'visitors';
 
-    // ---- MONTH FILTERING ----
-    function getMonthBoundaries() {
-      const now = new Date();
-      // Current month boundaries
-      const currentYear = now.getUTCFullYear();
-      const currentMonth = now.getUTCMonth();
-      const currentMonthStart = new Date(Date.UTC(currentYear, currentMonth, 1));
-      
-      // Previous month boundaries
-      const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-      const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-      const previousMonthStart = new Date(Date.UTC(previousYear, previousMonth, 1));
-      const previousMonthEnd = new Date(Date.UTC(currentYear, currentMonth, 1) - 1); // Last day of previous month
-
-      return {
-        currentMonthStart,
-        previousMonthStart,
-        previousMonthEnd
-      };
+    // Show loading indicator
+    function showLoading() {
+      document.getElementById('loadingIndicator').style.display = 'flex';
     }
 
-    function filterDataForStorage(data) {
-      const { currentMonthStart, previousMonthStart, previousMonthEnd } = getMonthBoundaries();
-      
-      return data.filter(entry => {
-        if (!entry.timestamp) return false;
-        const entryDate = new Date(entry.timestamp);
-        
-        // Check if entry is in current month or previous month
-        return (entryDate >= currentMonthStart) || 
-               (entryDate >= previousMonthStart && entryDate <= previousMonthEnd);
-      });
-    }
-
-    // ---- LOCAL STORAGE BACKUP ----
-    function saveToLocalStorage(data) {
-      try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-        return true;
-      } catch (e) {
-        console.error('Error saving to localStorage:', e);
-        return false;
-      }
-    }
-
-    function loadFromLocalStorage() {
-      try {
-        const data = localStorage.getItem(LOCAL_STORAGE_KEY);
-        return data ? JSON.parse(data) : [];
-      } catch (e) {
-        console.error('Error loading from localStorage:', e);
-        return [];
-      }
+    // Hide loading indicator
+    function hideLoading() {
+      document.getElementById('loadingIndicator').style.display = 'none';
     }
 
     // ---- DATE FILTERING ----
@@ -581,8 +616,115 @@
       doc.save(`superb_visitors_${new Date().toISOString().slice(0,10)}.pdf`);
     }
 
+    // ---- FIRESTORE OPERATIONS ----
+    async function saveVisitorData(data) {
+      try {
+        const docRef = await db.collection(COLLECTION_NAME).add(data);
+        console.log("Document written with ID: ", docRef.id);
+        return true;
+      } catch (error) {
+        console.error("Error adding document: ", error);
+        return false;
+      }
+    }
+
+    async function fetchAllVisitors() {
+      try {
+        const snapshot = await db.collection(COLLECTION_NAME).orderBy('timestamp', 'desc').get();
+        const visitors = [];
+        snapshot.forEach(doc => {
+          visitors.push({ id: doc.id, ...doc.data() });
+        });
+        return visitors;
+      } catch (error) {
+        console.error("Error getting documents: ", error);
+        return [];
+      }
+    }
+
+    // ---- JSONBIN OPERATIONS ----
+    async function fetchJsonBinData() {
+      try {
+        const res = await fetch(API_URL, {
+          headers: { "X-Master-Key": API_KEY }
+        });
+        if (res.ok) {
+          const json = await res.json();
+          return Array.isArray(json.record) ? json.record : [];
+        } else {
+          console.warn('JSONBin request failed:', res.status, res.statusText);
+          return [];
+        }
+      } catch (err) {
+        console.error('Network error fetching JSONBin data:', err);
+        return [];
+      }
+    }
+
+    // ---- MIGRATION FUNCTION ----
+    async function migrateData() {
+      showLoading();
+      try {
+        // Fetch data from JSONBin
+        const jsonData = await fetchJsonBinData();
+        if (jsonData.length === 0) {
+          document.getElementById('migrationError').textContent = 'No data found in JSONBin to migrate.';
+          document.getElementById('migrationError').style.display = 'block';
+          document.getElementById('migrationSuccess').style.display = 'none';
+          return;
+        }
+
+        // Check if data already exists in Firebase
+        const firebaseData = await fetchAllVisitors();
+        if (firebaseData.length > 0) {
+          // Ask for confirmation if data already exists
+          const confirm = window.confirm(`There are already ${firebaseData.length} records in Firebase. Do you want to proceed with migration? This may create duplicates.`);
+          if (!confirm) {
+            hideLoading();
+            return;
+          }
+        }
+
+        // Migrate data to Firebase
+        const batchSize = 10; // Process in batches to avoid timeouts
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (let i = 0; i < jsonData.length; i += batchSize) {
+          const batch = jsonData.slice(i, i + batchSize);
+          const promises = batch.map(item => saveVisitorData(item));
+          const results = await Promise.all(promises);
+          
+          successCount += results.filter(r => r).length;
+          errorCount += results.filter(r => !r).length;
+        }
+
+        if (errorCount === 0) {
+          document.getElementById('migrationSuccess').style.display = 'block';
+          document.getElementById('migrationError').style.display = 'none';
+        } else {
+          document.getElementById('migrationError').textContent = `Migration completed with ${errorCount} errors. ${successCount} records migrated successfully.`;
+          document.getElementById('migrationError').style.display = 'block';
+          document.getElementById('migrationSuccess').style.display = 'none';
+        }
+      } catch (error) {
+        console.error("Migration error:", error);
+        document.getElementById('migrationError').textContent = 'Migration failed: ' + error.message;
+        document.getElementById('migrationError').style.display = 'block';
+        document.getElementById('migrationSuccess').style.display = 'none';
+      } finally {
+        hideLoading();
+      }
+    }
+
     // ---- EVENT HANDLERS ----
     document.addEventListener('DOMContentLoaded', function() {
+      // Add migration button to footer for admin access
+      const footer = document.querySelector('.footer');
+      const migrationLink = document.createElement('div');
+      migrationLink.innerHTML = '<button class="export-btn" style="margin-top:10px;font-size:0.85rem;padding:6px 12px;" id="migrateData">Migrate Data</button>';
+      footer.parentNode.insertBefore(migrationLink, footer.nextSibling);
+
       // Form submission
       document.getElementById('visitorForm').onsubmit = async function(e) {
         e.preventDefault();
@@ -598,66 +740,10 @@
           timestamp: getSouthAfricaISO()
         };
 
-        let entries = [];
-        let apiSuccess = false;
-        
-        // Try to fetch from API first
+        showLoading();
         try {
-          const res = await fetch(API_URL, {
-            headers: { "X-Master-Key": API_KEY }
-          });
-          if (res.ok) {
-            const json = await res.json();
-            entries = Array.isArray(json.record) ? json.record : [];
-            // Filter to keep only current and previous month
-            entries = filterDataForStorage(entries);
-            apiSuccess = true;
-          } else {
-            console.warn('API request failed, falling back to localStorage');
-          }
-        } catch (err) {
-          console.warn('Network error, falling back to localStorage:', err);
-        }
-        
-        // If API failed, try localStorage
-        if (!apiSuccess) {
-          entries = loadFromLocalStorage();
-          // Also filter localStorage to keep only current and previous month
-          entries = filterDataForStorage(entries);
-        }
-
-        // Add the new entry
-        entries.push(data);
-
-        // Try to save to API first
-        try {
-          const updateRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Master-Key": API_KEY
-            },
-            body: JSON.stringify(entries)
-          });
-
-          if (updateRes.ok) {
-            // Also save to localStorage as backup
-            saveToLocalStorage(entries);
-            
-            form.reset();
-            const successMsg = document.getElementById('successMessage');
-            successMsg.classList.add('show');
-            setTimeout(() => {
-              successMsg.classList.remove('show');
-            }, 3200);
-          } else {
-            throw new Error(`API Error: ${updateRes.status} ${updateRes.statusText}`);
-          }
-        } catch (err) {
-          console.warn('Failed to save to API, saving to localStorage only:', err);
-          
-          // Save to localStorage as fallback
-          if (saveToLocalStorage(entries)) {
+          const success = await saveVisitorData(data);
+          if (success) {
             form.reset();
             const successMsg = document.getElementById('successMessage');
             successMsg.classList.add('show');
@@ -667,12 +753,18 @@
           } else {
             alert("Error saving your details. Please try again.");
           }
+        } catch (error) {
+          console.error("Submission error:", error);
+          alert("Error saving your details. Please try again.");
+        } finally {
+          hideLoading();
         }
       };
 
       // ---- MODAL ELEMENTS ----
       const exportModal = document.getElementById('exportModal');
       const passwordModal = document.getElementById('passwordModal');
+      const migrationModal = document.getElementById('migrationModal');
       const customDateFields = document.getElementById('customDateFields');
       const passwordError = document.getElementById('passwordError');
       const adminPasswordInput = document.getElementById('adminPassword');
@@ -725,6 +817,11 @@
       // ---- DATE RANGE OPTIONS ----
       document.getElementById('customRange').onchange = () => {
         customDateFields.classList.add('active');
+        // Set default dates to current month
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        document.getElementById('startDate').valueAsDate = firstDay;
+        document.getElementById('endDate').valueAsDate = today;
       };
       
       document.querySelectorAll('input[name="dateRange"]').forEach(input => {
@@ -750,52 +847,51 @@
           }
         }
         
-        let data = [];
-        let apiSuccess = false;
-        
-        // Try to fetch from API first
+        showLoading();
         try {
-          const res = await fetch(API_URL, {
-            headers: { "X-Master-Key": API_KEY }
-          });
+          const data = await fetchAllVisitors();
+          const filteredData = filterDataByRange(data, selectedRange, startDate, endDate);
           
-          if (res.ok) {
-            const json = await res.json();
-            data = Array.isArray(json.record) ? json.record : [];
-            apiSuccess = true;
-          } else {
-            console.warn('API request failed, falling back to localStorage');
+          if (filteredData.length === 0) {
+            alert("No visitor records match the selected criteria.");
+            hideLoading();
+            return;
           }
-        } catch (err) {
-          console.warn('Network error, falling back to localStorage:', err);
+          
+          // Export based on format
+          if (exportFormat === 'csv') {
+            exportToCSV(filteredData);
+          } else {
+            exportToPDF(filteredData);
+          }
+          
+          exportModal.style.display = 'none';
+        } catch (error) {
+          console.error("Export error:", error);
+          alert("Error exporting data. Please try again.");
+        } finally {
+          hideLoading();
         }
-        
-        // If API failed, try localStorage
-        if (!apiSuccess) {
-          data = loadFromLocalStorage();
-        }
-        
-        // Apply filtering based on date range
-        data = filterDataByRange(data, selectedRange, startDate, endDate);
-        
-        if (data.length === 0) {
-          alert("No visitor records match the selected criteria.");
-          return;
-        }
-        
-        // Export based on format
-        if (exportFormat === 'csv') {
-          exportToCSV(data);
-        } else {
-          exportToPDF(data);
-        }
-        
-        exportModal.style.display = 'none';
       };
 
       // ---- MODAL CANCEL BUTTONS ----
       document.getElementById('cancelExport').onclick = () => {
         exportModal.style.display = 'none';
+      };
+
+      // ---- MIGRATION MODAL ----
+      document.getElementById('migrateData').onclick = () => {
+        migrationModal.style.display = 'flex';
+        document.getElementById('migrationSuccess').style.display = 'none';
+        document.getElementById('migrationError').style.display = 'none';
+      };
+
+      document.getElementById('confirmMigration').onclick = async () => {
+        await migrateData();
+      };
+
+      document.getElementById('cancelMigration').onclick = () => {
+        migrationModal.style.display = 'none';
       };
 
       // Close modals when clicking outside
@@ -805,6 +901,9 @@
         }
         if (event.target === passwordModal) {
           passwordModal.style.display = 'none';
+        }
+        if (event.target === migrationModal) {
+          migrationModal.style.display = 'none';
         }
       };
     });
@@ -827,5 +926,5 @@
       });
     }
   </script>
-</body>
+</body>       
 </html>
