@@ -2,2085 +2,490 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Superb Hyper Visitor Portal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Superb Hyper | Visitor Registration Portal</title>
   <meta name="theme-color" content="#1a1f36">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231a1f36'/%3E%3Ctext x='50%25' y='58%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='Arial' font-size='48' font-weight='bold' letter-spacing='-2'%3ESH%3C/text%3E%3C/svg%3E" sizes="192x192" type="image/svg+xml">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <!-- Font Awesome, Google Fonts, Signature Pad, jsPDF, Firebase -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <style>
-    :root {
-      --primary-dark: #1a1f36;
-      --primary-blue: #2870ea;
-      --primary-gold: #d4af37;
-      --accent-blue: #4a90e2;
-      --accent-gold: #f2d16b;
-      --gradient-primary: linear-gradient(135deg, #1a1f36 0%, #2d3748 100%);
-      --gradient-gold: linear-gradient(135deg, #d4af37 0%, #f2d16b 100%);
-      --gradient-blue: linear-gradient(135deg, #2870ea 0%, #4a90e2 100%);
-      --bg-dark: #0f141e;
-      --bg-card: #ffffff;
-      --glass-bg: rgba(255, 255, 255, 0.98);
-      --glass-border: rgba(255, 255, 255, 0.3);
-      --shadow-light: rgba(26, 31, 54, 0.08);
-      --shadow-medium: rgba(26, 31, 54, 0.15);
-      --text-primary: #1a1f36;
-      --text-secondary: #4a5568;
-      --text-light: #718096;
-      --border-radius: 20px;
-      --border-radius-sm: 12px;
-      --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-fast: all 0.2s ease;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      min-height: 100vh;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: linear-gradient(135deg, #0f141e 0%, #1a1f36 50%, #0f141e 100%);
-      color: var(--text-primary);
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    /* Elegant Background */
-    .bg-elegant {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(circle at 15% 20%, rgba(212, 175, 55, 0.03) 0%, transparent 40%),
-        radial-gradient(circle at 85% 80%, rgba(40, 112, 234, 0.03) 0%, transparent 40%),
-        linear-gradient(135deg, #0f141e 0%, #1a1f36 100%);
-      z-index: 0;
-    }
-
-    /* Subtle Grid Pattern */
-    .bg-grid {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: 
-        linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px);
-      background-size: 50px 50px;
-      z-index: 1;
-      opacity: 0.3;
-    }
-
-    /* Main Container */
-    .main-container {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 30px 20px;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Header - More Elegant */
-    .header {
-      text-align: center;
-      margin-bottom: 40px;
-      position: relative;
-    }
-
-    .logo-container {
-      display: inline-block;
-      position: relative;
-      margin-bottom: 20px;
-    }
-
-    .logo {
-      font-size: 3.5rem;
-      font-weight: 800;
-      background: var(--gradient-gold);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: 1px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .logo-bg {
-      position: absolute;
-      top: -10px;
-      left: -20px;
-      right: -20px;
-      bottom: -10px;
-      background: var(--gradient-gold);
-      opacity: 0.1;
-      border-radius: 30px;
-      z-index: 1;
-      filter: blur(20px);
-    }
-
-    .tagline {
-      font-size: 1.1rem;
-      color: var(--accent-gold);
-      font-weight: 500;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-      opacity: 0.9;
-    }
-
-    .sub-tagline {
-      font-size: 0.9rem;
-      color: var(--text-light);
-      font-weight: 400;
-      max-width: 500px;
-      margin: 0 auto;
-      line-height: 1.5;
-    }
-
-    /* Step Progress - Refined */
-    .step-progress {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 50px;
-      position: relative;
-      max-width: 800px;
-      width: 100%;
-      padding: 0 20px;
-    }
-
-    .step-progress::before {
-      content: '';
-      position: absolute;
-      top: 25px;
-      left: 100px;
-      right: 100px;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.1);
-      z-index: 0;
-    }
-
-    .step-progress-line {
-      position: absolute;
-      top: 25px;
-      left: 100px;
-      height: 2px;
-      background: var(--gradient-gold);
-      z-index: 1;
-      transition: var(--transition);
-    }
-
-    .step-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      z-index: 2;
-      position: relative;
-      flex: 1;
-    }
-
-    .step-circle {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.05);
-      border: 2px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      color: var(--text-light);
-      font-size: 18px;
-      margin-bottom: 15px;
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
-      backdrop-filter: blur(10px);
-    }
-
-    .step-circle::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--gradient-gold);
-      opacity: 0;
-      transition: var(--transition);
-    }
-
-    .step-item.active .step-circle {
-      border-color: transparent;
-      transform: translateY(-5px);
-      box-shadow: 
-        0 10px 30px rgba(212, 175, 55, 0.3),
-        0 0 0 1px rgba(255, 255, 255, 0.1);
-    }
-
-    .step-item.active .step-circle::before {
-      opacity: 1;
-    }
-
-    .step-item.active .step-circle i {
-      color: white;
-      position: relative;
-      z-index: 1;
-    }
-
-    .step-item.completed .step-circle {
-      background: var(--gradient-gold);
-      border-color: transparent;
-      transform: scale(1);
-    }
-
-    .step-item.completed .step-circle i {
-      color: var(--primary-dark);
-    }
-
-    .step-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-light);
-      text-align: center;
-      transition: var(--transition);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    .step-item.active .step-label {
-      color: var(--accent-gold);
-      transform: translateY(2px);
-    }
-
-    /* Form Container - Luxurious */
-    .form-container {
-      width: 100%;
-      max-width: 520px;
-      position: relative;
-      min-height: 500px;
-      margin-bottom: 40px;
-    }
-
-    .form-step {
-      display: none;
-      width: 100%;
-      background: var(--glass-bg);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      border-radius: var(--border-radius);
-      padding: 45px;
-      box-shadow: 
-        0 25px 70px rgba(0, 0, 0, 0.25),
-        0 10px 40px rgba(26, 31, 54, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-      border: 1px solid var(--glass-border);
-      opacity: 0;
-      transform: translateY(30px) scale(0.98);
-      pointer-events: none;
-      transition: var(--transition);
-      z-index: 2;
-    }
-
-    .form-step.active {
-      display: block;
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      pointer-events: all;
-      z-index: 3;
-      animation: slideUpFade 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .form-step.exiting {
-      display: block;
-      opacity: 0;
-      transform: translateY(-30px) scale(0.98);
-      pointer-events: none;
-    }
-
-    @keyframes slideUpFade {
-      from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.98);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    .step-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .step-title {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--primary-dark);
-      margin-bottom: 12px;
-      position: relative;
-      display: inline-block;
-    }
-
-    .step-title::after {
-      content: '';
-      position: absolute;
-      bottom: -8px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 3px;
-      background: var(--gradient-gold);
-      border-radius: 3px;
-    }
-
-    .step-subtitle {
-      font-size: 15px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      max-width: 400px;
-      margin: 0 auto;
-    }
-
-    /* Form Groups - Refined */
-    .form-group {
-      margin-bottom: 28px;
-    }
-
-    .form-group label {
-      display: block;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 12px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      letter-spacing: 0.3px;
-    }
-
-    .form-group label i {
-      color: var(--primary-gold);
-      width: 20px;
-      text-align: center;
-      font-size: 16px;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 18px 22px;
-      background: rgba(255, 255, 255, 0.95);
-      border: 1.5px solid rgba(226, 232, 240, 0.8);
-      border-radius: var(--border-radius-sm);
-      font-size: 15px;
+      background: linear-gradient(145deg, #0c1120 0%, #151e2f 100%);
       font-family: 'Inter', sans-serif;
-      color: var(--text-primary);
-      transition: var(--transition);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+      padding: 2rem 1rem;
+      min-height: 100vh;
     }
-
-    .form-control:focus {
-      outline: none;
-      border-color: var(--primary-gold);
-      background: white;
-      box-shadow: 
-        0 10px 30px rgba(212, 175, 55, 0.15),
-        0 0 0 3px rgba(212, 175, 55, 0.1);
-      transform: translateY(-2px);
-    }
-
-    .form-control:hover:not(:focus) {
-      border-color: #cbd5e1;
-      transform: translateY(-1px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    }
-
-    select.form-control {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23d4af37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 20px center;
-      background-size: 18px;
-      padding-right: 55px;
-    }
-
-    textarea.form-control {
-      min-height: 130px;
-      resize: vertical;
-      line-height: 1.5;
-      font-family: 'Inter', sans-serif;
-    }
-
-    /* Form Navigation - Elegant */
-    .form-navigation {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 45px;
-      gap: 15px;
-    }
-
-    .btn {
-      padding: 16px 34px;
-      border: none;
-      border-radius: var(--border-radius-sm);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      min-width: 150px;
-      letter-spacing: 0.5px;
-      position: relative;
+    .container { max-width: 620px; margin: 0 auto; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(12px);
+      border-radius: 36px;
+      box-shadow: 0 25px 45px -12px rgba(0,0,0,0.4);
+      border: 1px solid rgba(212,175,55,0.4);
       overflow: hidden;
     }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: 0.5s;
-    }
-
-    .btn:hover::before {
-      left: 100%;
-    }
-
-    .btn-prev {
-      background: rgba(248, 250, 252, 0.9);
-      color: var(--text-secondary);
-      border: 1.5px solid rgba(226, 232, 240, 0.8);
-    }
-
-    .btn-prev:hover {
-      background: #f1f5f9;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-    }
-
-    .btn-next, .btn-submit {
-      background: var(--gradient-gold);
-      color: var(--primary-dark);
-      box-shadow: 0 10px 30px rgba(212, 175, 55, 0.25);
-      font-weight: 700;
-    }
-
-    .btn-next:hover, .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 15px 35px rgba(212, 175, 55, 0.35);
-    }
-
-    .btn-submit {
-      background: var(--gradient-blue);
-      color: white;
-      box-shadow: 0 10px 30px rgba(40, 112, 234, 0.25);
-    }
-
-    .btn-submit:hover {
-      box-shadow: 0 15px 35px rgba(40, 112, 234, 0.35);
-    }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none !important;
-      box-shadow: none !important;
-    }
-
-    .btn:disabled::before {
-      display: none;
-    }
-
-    /* Success Message - Luxurious */
-    .success-message {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.9);
-      background: var(--glass-bg);
-      backdrop-filter: blur(40px);
-      border-radius: var(--border-radius);
-      padding: 60px 50px;
-      text-align: center;
-      box-shadow: 
-        0 40px 100px rgba(0, 0, 0, 0.35),
-        0 20px 50px rgba(40, 112, 234, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-      border: 1px solid var(--glass-border);
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: var(--transition);
-      max-width: 90%;
-      width: 480px;
-    }
-
-    .success-message.show {
-      opacity: 1;
-      pointer-events: all;
-      transform: translate(-50%, -50%) scale(1);
-      animation: successAppear 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    @keyframes successAppear {
-      from {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.9);
-      }
-      to {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-      }
-    }
-
-    .success-icon {
-      width: 80px;
-      height: 80px;
-      background: var(--gradient-blue);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 30px;
-      color: white;
-      font-size: 36px;
-      box-shadow: 0 20px 50px rgba(40, 112, 234, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .success-icon::after {
-      content: '';
-      position: absolute;
-      top: -10px;
-      left: -10px;
-      right: -10px;
-      bottom: -10px;
-      background: var(--gradient-blue);
-      opacity: 0.2;
-      border-radius: 50%;
-      z-index: -1;
-      filter: blur(15px);
-    }
-
-    .success-title {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--primary-dark);
-      margin-bottom: 15px;
-      position: relative;
-    }
-
-    .success-title::after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 3px;
-      background: var(--gradient-gold);
-      border-radius: 3px;
-    }
-
-    .success-text {
-      font-size: 17px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin: 30px 0;
-    }
-
-    .success-details {
-      background: rgba(248, 250, 252, 0.9);
-      border-radius: var(--border-radius-sm);
-      padding: 25px;
-      margin-top: 25px;
-      text-align: left;
-      border-left: 4px solid var(--primary-gold);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
-    }
-
-    .success-details p {
-      margin-bottom: 10px;
-      color: var(--text-primary);
-      font-weight: 600;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .success-details p span {
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
-    /* Footer Actions - Sophisticated */
-    .footer-actions {
-      display: flex;
-      gap: 20px;
-      margin-top: 30px;
-      justify-content: center;
-      flex-wrap: wrap;
-      position: relative;
-      z-index: 10;
-    }
-
-    .action-btn {
-      padding: 16px 32px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: var(--border-radius-sm);
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      backdrop-filter: blur(10px);
-      position: relative;
-      overflow: hidden;
-      letter-spacing: 0.5px;
-    }
-
-    .action-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      transition: 0.5s;
-    }
-
-    .action-btn:hover::before {
-      left: 100%;
-    }
-
-    .action-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateY(-3px);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-    }
-
-    .action-btn.csv {
-      background: linear-gradient(135deg, rgba(35, 193, 129, 0.2) 0%, rgba(30, 215, 166, 0.2) 100%);
-      border-color: rgba(35, 193, 129, 0.3);
-    }
-
-    .action-btn.csv:hover {
-      background: linear-gradient(135deg, rgba(35, 193, 129, 0.3) 0%, rgba(30, 215, 166, 0.3) 100%);
-    }
-
-    .action-btn.pdf {
-      background: linear-gradient(135deg, rgba(230, 39, 57, 0.2) 0%, rgba(255, 107, 107, 0.2) 100%);
-      border-color: rgba(230, 39, 57, 0.3);
-    }
-
-    .action-btn.pdf:hover {
-      background: linear-gradient(135deg, rgba(230, 39, 57, 0.3) 0%, rgba(255, 107, 107, 0.3) 100%);
-    }
-
-    .action-btn.migrate {
-      background: linear-gradient(135deg, rgba(106, 17, 203, 0.2) 0%, rgba(37, 117, 252, 0.2) 100%);
-      border-color: rgba(106, 17, 203, 0.3);
-    }
-
-    .action-btn.migrate:hover {
-      background: linear-gradient(135deg, rgba(106, 17, 203, 0.3) 0%, rgba(37, 117, 252, 0.3) 100%);
-    }
-
-    /* Modals - Elegant */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(15, 20, 30, 0.9);
-      backdrop-filter: blur(15px);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: var(--transition);
-    }
-
-    .modal-overlay.show {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .modal {
-      background: var(--glass-bg);
-      backdrop-filter: blur(40px);
-      border-radius: var(--border-radius);
-      padding: 45px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 
-        0 40px 100px rgba(0, 0, 0, 0.35),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-      border: 1px solid var(--glass-border);
-      transform: translateY(40px);
-      opacity: 0;
-      transition: var(--transition);
-    }
-
-    .modal-overlay.show .modal {
-      transform: translateY(0);
-      opacity: 1;
-      animation: modalAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    @keyframes modalAppear {
-      from {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .modal-header {
-      text-align: center;
-      margin-bottom: 35px;
-    }
-
-    .modal-title {
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--primary-dark);
-      margin-bottom: 12px;
-      position: relative;
-      display: inline-block;
-    }
-
-    .modal-title::after {
-      content: '';
-      position: absolute;
-      bottom: -8px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 50px;
-      height: 3px;
-      background: var(--gradient-gold);
-      border-radius: 3px;
-    }
-
-    .modal-body {
-      margin-bottom: 35px;
-    }
-
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 15px;
-    }
-
-    .modal-btn {
-      padding: 14px 30px;
-      border: none;
-      border-radius: var(--border-radius-sm);
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      min-width: 110px;
-      letter-spacing: 0.3px;
-    }
-
-    .modal-btn.cancel {
-      background: rgba(248, 250, 252, 0.9);
-      color: var(--text-secondary);
-      border: 1.5px solid rgba(226, 232, 240, 0.8);
-    }
-
-    .modal-btn.confirm {
-      background: var(--gradient-blue);
-      color: white;
-      box-shadow: 0 8px 25px rgba(40, 112, 234, 0.25);
-    }
-
-    .modal-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Loading Spinner */
-    .loading-spinner {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(15, 20, 30, 0.95);
-      backdrop-filter: blur(15px);
-      z-index: 2000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: var(--transition);
-    }
-
-    .loading-spinner.show {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .spinner {
-      width: 60px;
-      height: 60px;
-      border: 4px solid rgba(255, 255, 255, 0.1);
-      border-top: 4px solid var(--primary-gold);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      position: relative;
-    }
-
-    .spinner::after {
-      content: '';
-      position: absolute;
-      top: -10px;
-      left: -10px;
-      right: -10px;
-      bottom: -10px;
-      border-radius: 50%;
-      border: 4px solid transparent;
-      border-top: 4px solid rgba(212, 175, 55, 0.2);
-      animation: spin 1.5s linear infinite reverse;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Review Details */
-    .review-details {
-      background: rgba(248, 250, 252, 0.9);
-      border-radius: var(--border-radius-sm);
-      padding: 30px;
-      margin-bottom: 30px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
-      border: 1px solid rgba(226, 232, 240, 0.8);
-    }
-    
-    .review-item {
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-    
-    .review-item:last-child {
-      border-bottom: none;
-    }
-    
-    .review-item strong {
-      color: var(--text-primary);
-      font-weight: 600;
-      min-width: 160px;
-    }
-    
-    .review-item span {
-      color: var(--text-secondary);
-      text-align: right;
-      flex: 1;
-    }
-
-    /* Form Field Indicators */
-    .required-indicator {
-      color: var(--primary-blue);
-      font-weight: 700;
-      margin-left: 4px;
-    }
-
-    /* Date Range Options */
-    .date-option {
-      margin-bottom: 12px;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: var(--border-radius-sm);
-      border: 1.5px solid rgba(226, 232, 240, 0.8);
-      transition: var(--transition);
-      cursor: pointer;
-    }
-
-    .date-option:hover {
-      border-color: var(--primary-gold);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    }
-
-    .date-option input[type="radio"] {
-      margin-right: 12px;
-      accent-color: var(--primary-gold);
-    }
-
-    .date-option label {
-      font-weight: 600;
-      color: var(--text-primary);
-      cursor: pointer;
-    }
-
-    /* Password Error */
-    .password-error {
-      background: rgba(230, 39, 57, 0.1);
-      border: 1.5px solid rgba(230, 39, 57, 0.2);
-      border-radius: var(--border-radius-sm);
-      padding: 12px 18px;
-      margin-top: 15px;
-      color: var(--primary-red);
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* Migration Status */
-    .migration-status {
-      background: rgba(35, 193, 129, 0.1);
-      border: 1.5px solid rgba(35, 193, 129, 0.2);
-      border-radius: var(--border-radius-sm);
-      padding: 15px;
-      margin-top: 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 500;
-    }
-
-    .migration-status.error {
-      background: rgba(230, 39, 57, 0.1);
-      border-color: rgba(230, 39, 57, 0.2);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .step-progress {
-        gap: 20px;
-        padding: 0;
-      }
-      
-      .step-progress::before {
-        left: 60px;
-        right: 60px;
-      }
-      
-      .step-progress-line {
-        left: 60px;
-      }
-      
-      .form-step {
-        padding: 35px 25px;
-      }
-      
-      .step-title {
-        font-size: 24px;
-      }
-      
-      .btn {
-        padding: 14px 24px;
-        min-width: 130px;
-      }
-      
-      .form-navigation {
-        flex-direction: column;
-      }
-      
-      .success-message {
-        padding: 40px 30px;
-        width: 95%;
-      }
-      
-      .footer-actions {
-        flex-direction: column;
-        align-items: center;
-      }
-      
-      .action-btn {
-        width: 100%;
-        max-width: 300px;
-        justify-content: center;
-      }
-      
-      .modal {
-        padding: 35px 25px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .step-progress {
-        gap: 15px;
-      }
-      
-      .step-progress::before {
-        left: 40px;
-        right: 40px;
-      }
-      
-      .step-progress-line {
-        left: 40px;
-      }
-      
-      .step-circle {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-      }
-      
-      .step-label {
-        font-size: 11px;
-      }
-      
-      .form-container {
-        min-height: 550px;
-      }
-      
-      .logo {
-        font-size: 2.8rem;
-      }
-      
-      .tagline {
-        font-size: 1rem;
-      }
-    }
-
-    /* Decorative Elements */
-    .decorative-line {
-      position: absolute;
-      width: 100px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--primary-gold), transparent);
-      opacity: 0.5;
-    }
-
-    .decorative-line.top {
-      top: 20%;
-      left: 10%;
-    }
-
-    .decorative-line.bottom {
-      bottom: 20%;
-      right: 10%;
-    }
-
-    /* Subtle floating animations */
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    .floating {
-      animation: float 6s ease-in-out infinite;
-    }
+    .logo-area { text-align: center; margin-bottom: 1.5rem; }
+    .logo-text {
+      font-size: 2.5rem; font-weight: 800;
+      background: linear-gradient(135deg, #e4b837, #c49a1c);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .badge { background: rgba(212,175,55,0.2); backdrop-filter: blur(4px); padding: 0.2rem 1rem; border-radius: 60px; font-size: 0.75rem; display: inline-block; color: #f5cd6d; margin-top: 6px; }
+    .steps { display: flex; gap: 0.5rem; margin-bottom: 1.8rem; padding: 0 1rem; }
+    .step { flex: 1; text-align: center; font-size: 0.7rem; font-weight: 600; color: #8e9aaf; }
+    .step .circle {
+      width: 40px; height: 40px; background: #eef2ff; border-radius: 40px; margin: 0 auto 6px;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; color: #2c3e66;
+      transition: all 0.2s; border: 1px solid #cdd9ff;
+    }
+    .step.active .circle { background: linear-gradient(145deg, #d4af37, #b88b1a); color: #1e2a3a; border: none; box-shadow: 0 6px 14px rgba(212,175,55,0.3); }
+    .step.completed .circle { background: #1f3b4c; color: #ffdf8c; border-color: #ffcd7e; }
+    .form-panel { padding: 2rem; }
+    .form-group { margin-bottom: 1.3rem; }
+    label { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 8px; color: #1e293b; }
+    label i { color: #d4af37; width: 20px; }
+    input, select, textarea { width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 24px; font-family: 'Inter', sans-serif; font-size: 0.9rem; background: white; transition: 0.2s; }
+    input:focus, select:focus { border-color: #d4af37; outline: none; box-shadow: 0 0 0 3px rgba(212,175,55,0.2); }
+    .signature-container { border: 2px dashed #cbd5e1; border-radius: 24px; background: #fefcf5; padding: 12px; margin-top: 8px; }
+    canvas.signature-pad { width: 100%; height: 140px; background: white; border-radius: 20px; border: 1px solid #e2e8f0; touch-action: none; }
+    .sig-buttons { display: flex; gap: 12px; margin-top: 10px; }
+    .small-btn { background: #f1f5f9; border: none; padding: 6px 16px; border-radius: 40px; font-size: 0.75rem; font-weight: 500; cursor: pointer; }
+    .legal-clause { background: #fff7e8; border-radius: 24px; padding: 1rem; margin: 1rem 0; border-left: 6px solid #d4af37; font-size: 0.8rem; line-height: 1.5; }
+    .checkbox-row { display: flex; align-items: center; gap: 12px; margin: 1rem 0; }
+    .btn-group { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; }
+    button { padding: 12px 24px; border-radius: 40px; font-weight: 700; border: none; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-family: 'Inter', sans-serif; }
+    .btn-primary { background: linear-gradient(95deg, #d4af37, #f2cf6a); color: #1e2a36; box-shadow: 0 5px 12px rgba(0,0,0,0.1); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(212,175,55,0.3); }
+    .btn-secondary { background: #eef2ff; color: #2c3e66; border: 1px solid #ccd7f0; }
+    .review-card { background: #fef9e6; border-radius: 24px; padding: 1rem; margin-bottom: 1rem; }
+    .review-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #e2c28b; padding: 8px 0; }
+    .signature-thumb { background: #f0ebe0; border-radius: 16px; padding: 10px; text-align: center; margin-top: 12px; }
+    .footer-actions { display: flex; gap: 12px; justify-content: center; margin-top: 1.5rem; }
+    .action-icon { background: rgba(255,255,240,0.2); backdrop-filter: blur(8px); padding: 10px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; border: 1px solid rgba(212,175,55,0.5); transition: 0.2s; }
+    .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; visibility: hidden; opacity: 0; transition: 0.2s; }
+    .modal-overlay.active { visibility: visible; opacity: 1; }
+    .modal-content { background: white; border-radius: 32px; max-width: 460px; width: 90%; padding: 2rem; }
+    .error-text { color: #c2410c; font-size: 0.7rem; margin-top: 5px; }
+    .warning-badge { background: #fef3c7; color: #b45309; border-radius: 20px; padding: 8px 12px; font-size: 0.7rem; margin-top: 8px; display: inline-block; }
+    @keyframes fadeSlide { from { opacity:0; transform: translateY(10px);} to { opacity:1; transform: translateY(0);} }
+    .form-step { animation: fadeSlide 0.3s ease; }
+    @media (max-width: 550px) { .form-panel { padding: 1.5rem; } .btn-group { flex-direction: column; } }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Background Elements -->
-  <div class="bg-elegant"></div>
-  <div class="bg-grid"></div>
-  <div class="decorative-line top"></div>
-  <div class="decorative-line bottom"></div>
-
-  <!-- Main Container -->
-  <div class="main-container">
-    <!-- Header -->
-    <div class="header">
-      <div class="logo-container">
-        <div class="logo-bg"></div>
-        <div class="logo floating">Superb Hyper</div>
-      </div>
-      <div class="tagline">Visitor Registration Portal</div>
-      <div class="sub-tagline">Experience premium service and seamless registration</div>
+<div class="container">
+  <div class="logo-area">
+    <div class="logo-text">SUPERB HYPER</div>
+    <div class="badge"><i class="fas fa-door-open"></i> VISITOR REGISTRATION PORTAL</div>
+    <p style="color:#9aaec0; font-size:0.75rem;">Premium service | Secure check-in | Signature required</p>
+  </div>
+  <div class="steps" id="stepIndicator">
+    <div class="step" data-step="1"><div class="circle">1</div><span>Personal Info</span></div>
+    <div class="step" data-step="2"><div class="circle">2</div><span>Visit Details</span></div>
+    <div class="step" data-step="3"><div class="circle">3</div><span>Signature</span></div>
+    <div class="step" data-step="4"><div class="circle">4</div><span>Confirmation</span></div>
+  </div>
+  <div class="glass-card">
+    <!-- Step 1: Personal Information -->
+    <div id="step1" class="form-panel form-step">
+      <h3><i class="fas fa-id-card"></i> Personal Information</h3>
+      <div class="form-group"><label><i class="fas fa-user"></i> Full Name *</label><input type="text" id="fullName" placeholder="Enter your full name"></div>
+      <div class="form-group"><label><i class="fas fa-phone-alt"></i> Contact Number *</label><input type="tel" id="contact" placeholder="Your phone number"></div>
+      <div class="form-group"><label><i class="fas fa-building"></i> Company / Organisation</label><input type="text" id="company" placeholder="Company name (optional)"></div>
+      <div class="btn-group"><div></div><button class="btn-primary" id="nextStep1">Next <i class="fas fa-arrow-right"></i></button></div>
     </div>
-
-    <!-- Step Progress -->
-    <div class="step-progress">
-      <div class="step-progress-line" id="progressLine"></div>
+    <!-- Step 2: Visit Details -->
+    <div id="step2" class="form-panel form-step" style="display:none;">
+      <h3><i class="fas fa-calendar-check"></i> Visit Details</h3>
+      <div class="form-group"><label><i class="fas fa-user-tie"></i> Person to Visit *</label><input type="text" id="personToVisit" placeholder="Who are you visiting?"></div>
+      <div class="form-group"><label><i class="fas fa-clipboard-list"></i> Purpose of Visit *</label>
+        <select id="purpose">
+          <option value="">Select purpose</option>
+          <option value="Business Meeting">Business Meeting</option>
+          <option value="Delivery">Delivery</option>
+          <option value="Interview">Interview</option>
+          <option value="Maintenance">Maintenance</option>
+          <option value="Client Visit">Client Visit</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label><i class="fas fa-car"></i> Vehicle Registration</label><input type="text" id="vehicle" placeholder="Vehicle plate number (optional)"></div>
+      <div class="form-group"><label><i class="fas fa-sticky-note"></i> Additional Notes</label><textarea id="notes" rows="2" placeholder="Any special requirements or additional information..."></textarea></div>
+      <div class="btn-group"><button class="btn-secondary" id="prevStep2"><i class="fas fa-arrow-left"></i> Back</button><button class="btn-primary" id="nextStep2">Next →</button></div>
+    </div>
+    <!-- Step 3: Signature (for ALL visitors) + Maintenance Clause (only shown if purpose = Maintenance) -->
+    <div id="step3" class="form-panel form-step" style="display:none;">
+      <h3><i class="fas fa-signature"></i> Digital Signature</h3>
+      <p style="font-size:0.8rem; color:#4a5568; margin-bottom:1rem;">Please sign below to confirm your visit registration.</p>
       
-      <div class="step-item active" data-step="1">
-        <div class="step-circle">
-          <i class="fas fa-user"></i>
+      <!-- Maintenance Clause Panel - ONLY VISIBLE when purpose is Maintenance -->
+      <div id="maintenanceClausePanel" style="display:none;">
+        <div class="legal-clause">
+          <p><i class="fas fa-hard-hat"></i> <strong>Maintenance Service Provider Agreement</strong></p>
+          <p>1. <strong>Safe Work Practices</strong> – Service Providers must ensure all Safe Work Practices are observed (working at heights, equipment use, power tools, signage).</p>
+          <p>2. <strong>Public Liability</strong> – Superb Hyper will not be held liable for any issues with Team Members or the public whilst you work on site.</p>
+          <p>3. <strong>Designated Exit & Entrance</strong> – Use designated points; security searches may be conducted if necessary.</p>
+          <p>4. <strong>Report to Reception</strong> – Report to reception upon arrival and before leaving. A register will be produced for completion.</p>
         </div>
-        <div class="step-label">Personal Info</div>
+        <div class="checkbox-row"><input type="checkbox" id="agreeClauses"> <label for="agreeClauses" style="font-weight:700;">I have read, understood and agree to abide by all Maintenance Service Provider rules and safety protocols.</label></div>
+        <div class="error-text" id="clauseErrorMsg"></div>
       </div>
       
-      <div class="step-item" data-step="2">
-        <div class="step-circle">
-          <i class="fas fa-building"></i>
+      <!-- Signature Pad - For ALL visitors -->
+      <div class="form-group" style="margin-top: 10px;">
+        <label><i class="fas fa-pen-fancy"></i> Your Signature (draw below) *</label>
+        <div class="signature-container">
+          <canvas id="signatureCanvas" class="signature-pad" width="500" height="140" style="width:100%; height:140px; background:white;"></canvas>
+          <div class="sig-buttons">
+            <button type="button" class="small-btn" id="clearSignatureBtn"><i class="fas fa-eraser"></i> Clear</button>
+            <button type="button" class="small-btn" id="undoSignatureBtn"><i class="fas fa-undo-alt"></i> Undo</button>
+          </div>
         </div>
-        <div class="step-label">Visit Details</div>
+        <div class="error-text" id="sigErrorMsg"></div>
       </div>
+      <div class="form-group"><label><i class="fas fa-calendar-alt"></i> Date of signing</label><input type="date" id="agreementDate"></div>
       
-      <div class="step-item" data-step="3">
-        <div class="step-circle">
-          <i class="fas fa-car"></i>
-        </div>
-        <div class="step-label">Vehicle & Notes</div>
-      </div>
-      
-      <div class="step-item" data-step="4">
-        <div class="step-circle">
-          <i class="fas fa-check-circle"></i>
-        </div>
-        <div class="step-label">Confirmation</div>
-      </div>
+      <div class="btn-group"><button class="btn-secondary" id="prevStep3"><i class="fas fa-arrow-left"></i> Back</button><button class="btn-primary" id="nextStep3">Review & Submit →</button></div>
     </div>
-
-    <!-- Form Container -->
-    <div class="form-container">
-      <!-- Step 1: Personal Information -->
-      <div class="form-step active" id="step1">
-        <div class="step-header">
-          <h2 class="step-title">Personal Information</h2>
-          <p class="step-subtitle">Please provide your personal details for registration</p>
-        </div>
-        
-        <div class="form-group">
-          <label for="fullName"><i class="fas fa-user-circle"></i> Full Name <span class="required-indicator">*</span></label>
-          <input type="text" id="fullName" class="form-control" placeholder="Enter your full name" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="contact"><i class="fas fa-phone"></i> Contact Number <span class="required-indicator">*</span></label>
-          <input type="tel" id="contact" class="form-control" placeholder="Your phone number" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="company"><i class="fas fa-building"></i> Company / Organisation</label>
-          <input type="text" id="company" class="form-control" placeholder="Your company name (optional)">
-        </div>
-        
-        <div class="form-navigation">
-          <div></div>
-          <button class="btn btn-next" id="next1">
-            Next <i class="fas fa-arrow-right"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Step 2: Visit Details -->
-      <div class="form-step" id="step2">
-        <div class="step-header">
-          <h2 class="step-title">Visit Details</h2>
-          <p class="step-subtitle">Tell us about the purpose of your visit</p>
-        </div>
-        
-        <div class="form-group">
-          <label for="personToVisit"><i class="fas fa-user-friends"></i> Person to Visit <span class="required-indicator">*</span></label>
-          <input type="text" id="personToVisit" class="form-control" placeholder="Who are you visiting?" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="purpose"><i class="fas fa-bullseye"></i> Purpose of Visit <span class="required-indicator">*</span></label>
-          <select id="purpose" class="form-control" required>
-            <option value="">Select purpose</option>
-            <option>Business Meeting</option>
-            <option>Delivery</option>
-            <option>Interview</option>
-            <option>Maintenance</option>
-            <option>Client Visit</option>
-            <option>Other</option>
-          </select>
-        </div>
-        
-        <div class="form-navigation">
-          <button class="btn btn-prev" id="prev2">
-            <i class="fas fa-arrow-left"></i> Previous
-          </button>
-          <button class="btn btn-next" id="next2">
-            Next <i class="fas fa-arrow-right"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Step 3: Vehicle & Notes -->
-      <div class="form-step" id="step3">
-        <div class="step-header">
-          <h2 class="step-title">Vehicle & Additional Info</h2>
-          <p class="step-subtitle">Provide vehicle details and any additional notes</p>
-        </div>
-        
-        <div class="form-group">
-          <label for="vehicle"><i class="fas fa-car"></i> Vehicle Registration</label>
-          <input type="text" id="vehicle" class="form-control" placeholder="Vehicle plate number (optional)">
-        </div>
-        
-        <div class="form-group">
-          <label for="notes"><i class="fas fa-sticky-note"></i> Additional Notes</label>
-          <textarea id="notes" class="form-control" placeholder="Any special requirements or additional information..."></textarea>
-        </div>
-        
-        <div class="form-navigation">
-          <button class="btn btn-prev" id="prev3">
-            <i class="fas fa-arrow-left"></i> Previous
-          </button>
-          <button class="btn btn-next" id="next3">
-            Next <i class="fas fa-arrow-right"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Step 4: Confirmation -->
-      <div class="form-step" id="step4">
-        <div class="step-header">
-          <h2 class="step-title">Review & Submit</h2>
-          <p class="step-subtitle">Please review your information before submitting</p>
-        </div>
-        
-        <div class="review-details">
-          <div class="review-item">
-            <strong>Full Name:</strong> <span id="reviewFullName"></span>
-          </div>
-          <div class="review-item">
-            <strong>Contact:</strong> <span id="reviewContact"></span>
-          </div>
-          <div class="review-item">
-            <strong>Company:</strong> <span id="reviewCompany"></span>
-          </div>
-          <div class="review-item">
-            <strong>Person to Visit:</strong> <span id="reviewPerson"></span>
-          </div>
-          <div class="review-item">
-            <strong>Purpose:</strong> <span id="reviewPurpose"></span>
-          </div>
-          <div class="review-item">
-            <strong>Vehicle:</strong> <span id="reviewVehicle"></span>
-          </div>
-          <div class="review-item">
-            <strong>Notes:</strong> <span id="reviewNotes"></span>
-          </div>
-        </div>
-        
-        <div class="form-navigation">
-          <button class="btn btn-prev" id="prev4">
-            <i class="fas fa-arrow-left"></i> Previous
-          </button>
-          <button class="btn btn-submit" id="submitForm">
-            <i class="fas fa-check-circle"></i> Submit Registration
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer Actions -->
-    <div class="footer-actions">
-      <button class="action-btn csv" id="exportCSV">
-        <i class="fas fa-file-csv"></i> Export CSV
-      </button>
-      <button class="action-btn pdf" id="exportPDF">
-        <i class="fas fa-file-pdf"></i> Export PDF
-      </button>
-      <button class="action-btn migrate" id="migrateData">
-        <i class="fas fa-database"></i> Migrate Data
-      </button>
+    <!-- Step 4: Confirmation with signature preview -->
+    <div id="step4" class="form-panel form-step" style="display:none;">
+      <h3><i class="fas fa-check-circle"></i> Review & Submit</h3>
+      <div class="review-card" id="reviewContainer"></div>
+      <div id="signaturePreviewArea" class="signature-thumb"></div>
+      <div class="btn-group"><button class="btn-secondary" id="prevStep4"><i class="fas fa-arrow-left"></i> Back</button><button class="btn-primary" id="submitFinal"><i class="fas fa-check-circle"></i> Submit Registration</button></div>
     </div>
   </div>
-
-  <!-- Success Message -->
-  <div class="success-message" id="successMessage">
-    <div class="success-icon">
-      <i class="fas fa-check"></i>
-    </div>
-    <h2 class="success-title">Registration Successful!</h2>
-    <p class="success-text">Thank you for signing in. Please proceed to the reception desk and take a seat.</p>
-    <div class="success-details">
-      <p><strong>Visitor ID:</strong> <span id="successVisitorId"></span></p>
-      <p><strong>Time:</strong> <span id="successTime"></span></p>
-    </div>
+  <div class="footer-actions">
+    <div class="action-icon" id="exportCsvBtn"><i class="fas fa-file-csv"></i> Export CSV</div>
+    <div class="action-icon" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Export PDF (with Signatures)</div>
+    <div class="action-icon" id="migrateBtn"><i class="fas fa-database"></i> Migrate Data</div>
   </div>
+</div>
 
-  <!-- Export Modal -->
-  <div class="modal-overlay" id="exportModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 class="modal-title">Export Options</h3>
-        <p class="step-subtitle">Select date range for export</p>
-      </div>
-      <div class="modal-body">
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          <div class="date-option">
-            <input type="radio" id="allTime" name="dateRange" value="all" checked>
-            <label for="allTime">All Data</label>
-          </div>
-          <div class="date-option">
-            <input type="radio" id="monthToDate" name="dateRange" value="month">
-            <label for="monthToDate">Month to Date</label>
-          </div>
-          <div class="date-option">
-            <input type="radio" id="lifeToDate" name="dateRange" value="life">
-            <label for="lifeToDate">Life to Date</label>
-          </div>
-          <div class="date-option">
-            <input type="radio" id="customRange" name="dateRange" value="custom">
-            <label for="customRange">Custom Range</label>
-          </div>
-          <div id="customDateFields" style="display: none; flex-direction: column; gap: 12px; margin-top: 15px; padding: 20px; background: rgba(255, 255, 255, 0.9); border-radius: var(--border-radius-sm); border: 1.5px solid rgba(226, 232, 240, 0.8);">
-            <label for="startDate">Start Date:</label>
-            <input type="date" id="startDate" class="form-control">
-            <label for="endDate">End Date:</label>
-            <input type="date" id="endDate" class="form-control">
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="modal-btn cancel" id="cancelExport">Cancel</button>
-        <button class="modal-btn confirm" id="confirmExport">Export</button>
-      </div>
-    </div>
-  </div>
+<!-- Modals -->
+<div id="passwordModal" class="modal-overlay"><div class="modal-content"><h3><i class="fas fa-lock"></i> Admin Authentication</h3><input type="password" id="adminPass" placeholder="Enter admin password"><div id="passError" style="color:red;font-size:0.8rem;"></div><div class="btn-group"><button id="cancelPassModal" class="btn-secondary">Cancel</button><button id="confirmPassModal" class="btn-primary">Confirm</button></div></div></div>
+<div id="exportModal" class="modal-overlay"><div class="modal-content"><h3>Export Visitor Records</h3><div><label><input type="radio" name="range" value="all" checked> All Data</label></div><div><label><input type="radio" name="range" value="month"> Month to Date</label></div><div><label><input type="radio" name="range" value="custom"> Custom Range</label><div id="customDateDiv" style="display:none; margin-top:8px;"><input type="date" id="startDateCustom"><input type="date" id="endDateCustom" style="margin-top:8px;"></div></div><div class="btn-group"><button id="cancelExportModal" class="btn-secondary">Cancel</button><button id="confirmExportAction" class="btn-primary">Export</button></div></div></div>
+<div id="migrationModal" class="modal-overlay"><div class="modal-content"><h3>Data Migration</h3><p>Migrate existing visitor data from JSONBin to Firebase (signatures will be stored).</p><button id="doMigration" class="btn-primary">Start Migration</button><button id="cancelMigrationModal" class="btn-secondary" style="margin-left:8px;">Close</button><div id="migrateStatus"></div></div></div>
+<div id="loadingToast" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1a2c3e; color:white; padding:8px 20px; border-radius:40px; z-index:2000; display:none;">Processing...</div>
 
-  <!-- Password Modal -->
-  <div class="modal-overlay" id="passwordModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 class="modal-title">Admin Authentication</h3>
-        <p class="step-subtitle">Enter password to proceed</p>
-      </div>
-      <div class="modal-body">
-        <input type="password" id="adminPassword" class="form-control" placeholder="Enter admin password">
-        <div class="password-error" id="passwordError" style="display: none;">
-          <i class="fas fa-exclamation-circle"></i> Incorrect password. Please try again.
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="modal-btn cancel" id="cancelPassword">Cancel</button>
-        <button class="modal-btn confirm" id="confirmPassword">Confirm</button>
-      </div>
-    </div>
-  </div>
+<script>
+  // Firebase Configuration
+  const firebaseConfig = { apiKey: "AIzaSyD3HcG5FIr_5hQDKOzrKuEGZNA4EQeu2HU", authDomain: "visitor-form-f6ae9.firebaseapp.com", projectId: "visitor-form-f6ae9", storageBucket: "visitor-form-f6ae9.firebasestorage.app", messagingSenderId: "140839989587", appId: "1:140839989587:web:63e4f2add9eeedaa0431a6", measurementId: "G-VLP8XN6XE6" };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const COLLECTION = "visitors";
 
-  <!-- Migration Modal -->
-  <div class="modal-overlay" id="migrationModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 class="modal-title">Data Migration</h3>
-        <p class="step-subtitle">Migrate data from JSONBin to Firebase</p>
-      </div>
-      <div class="modal-body">
-        <p>This will migrate all existing visitor data from JSONBin to Firebase.</p>
-        <p style="color: var(--primary-red); font-weight: 600; margin-top: 15px; display: flex; align-items: center; gap: 10px;">
-          <i class="fas fa-exclamation-triangle"></i> Warning: This should only be done once!
-        </p>
-        <div class="migration-status" id="migrationSuccess" style="display: none;">
-          <i class="fas fa-check-circle"></i> Migration completed successfully!
-        </div>
-        <div class="migration-status error" id="migrationError" style="display: none;">
-          <i class="fas fa-exclamation-circle"></i> Migration failed. Please try again.
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="modal-btn cancel" id="cancelMigration">Cancel</button>
-        <button class="modal-btn confirm" id="confirmMigration">Migrate Data</button>
-      </div>
-    </div>
-  </div>
+  // JSONBin Config
+  const API_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
+  const BIN_ID = '68669b0e8a456b7966babb15';
+  const ADMIN_PASSWORD = 'Superb@123';
 
-  <!-- Loading Spinner -->
-  <div class="loading-spinner" id="loadingIndicator">
-    <div class="spinner"></div>
-  </div>
+  // Signature Pad
+  let signaturePad = null;
+  let signatureHistory = [];
+  
+  function initSignaturePad() {
+    const canvas = document.getElementById('signatureCanvas');
+    if(!canvas) return;
+    canvas.width = canvas.offsetWidth || 500;
+    canvas.height = 140;
+    signaturePad = new SignaturePad(canvas, { backgroundColor: 'rgb(255,255,255)', penColor: '#1e293b' });
+    signaturePad.addEventListener("end", () => { saveStateToHistory(); });
+    document.getElementById('clearSignatureBtn').onclick = () => { signaturePad.clear(); signatureHistory = []; };
+    document.getElementById('undoSignatureBtn').onclick = () => { undoSignature(); };
+  }
+  function saveStateToHistory() { if(signaturePad && !signaturePad.isEmpty()) { const data = signaturePad.toData(); signatureHistory.push(data); if(signatureHistory.length>10) signatureHistory.shift(); } }
+  function undoSignature() { if(signatureHistory.length>0) { const lastState = signatureHistory.pop(); signaturePad.fromData(lastState); } else { signaturePad.clear(); } }
+  function getSignatureAsBase64() { if(signaturePad && !signaturePad.isEmpty()) return signaturePad.toDataURL(); return null; }
+  function isSignatureEmpty() { return !signaturePad || signaturePad.isEmpty(); }
 
-  <!-- JavaScript remains exactly the same as in your original code -->
-  <script>
-    // ---- Firebase Configuration ----
-    const firebaseConfig = {
-      apiKey: "AIzaSyD3HcG5FIr_5hQDKOzrKuEGZNA4EQeu2HU",
-      authDomain: "visitor-form-f6ae9.firebaseapp.com",
-      projectId: "visitor-form-f6ae9",
-      storageBucket: "visitor-form-f6ae9.firebasestorage.app",
-      messagingSenderId: "140839989587",
-      appId: "1:140839989587:web:63e4f2add9eeedaa0431a6",
-      measurementId: "G-VLP8XN6XE6"
+  // Step Management
+  let currentStep = 1;
+  const stepPanels = {1: document.getElementById('step1'), 2: document.getElementById('step2'), 3: document.getElementById('step3'), 4: document.getElementById('step4')};
+  
+  function updateStepUI() {
+    for(let i=1;i<=4;i++) { stepPanels[i].style.display = (i===currentStep) ? 'block' : 'none'; }
+    document.querySelectorAll('.step').forEach((el,idx)=>{ if(idx+1 < currentStep) el.classList.add('completed'); else el.classList.remove('completed'); if(idx+1===currentStep) el.classList.add('active'); else el.classList.remove('active'); });
+  }
+  function navigateTo(step) { if(step>=1 && step<=4) { currentStep=step; updateStepUI(); } }
+  
+  // Update maintenance clause visibility based on purpose
+  function updateMaintenanceClauseVisibility() {
+    const purpose = document.getElementById('purpose').value;
+    const clausePanel = document.getElementById('maintenanceClausePanel');
+    if(purpose === 'Maintenance') {
+      clausePanel.style.display = 'block';
+    } else {
+      clausePanel.style.display = 'none';
+      // Uncheck agreement when hidden
+      document.getElementById('agreeClauses').checked = false;
+      document.getElementById('clauseErrorMsg').innerText = '';
+    }
+  }
+  
+  function validateStep1() { 
+    let name=document.getElementById('fullName').value.trim(); 
+    let contact=document.getElementById('contact').value.trim(); 
+    if(!name){ alert("Please enter your full name"); return false; } 
+    if(!contact){ alert("Please enter your contact number"); return false; } 
+    return true; 
+  }
+  function validateStep2() { 
+    let person=document.getElementById('personToVisit').value.trim(); 
+    let purp=document.getElementById('purpose').value; 
+    if(!person){ alert("Please enter the person you are visiting"); return false; } 
+    if(!purp){ alert("Please select a purpose for your visit"); return false; } 
+    return true; 
+  }
+  function validateStep3() {
+    // Signature required for ALL visitors
+    if(isSignatureEmpty()) { 
+      document.getElementById('sigErrorMsg').innerText = "Signature required. Please draw your signature above."; 
+      return false; 
+    }
+    document.getElementById('sigErrorMsg').innerText = "";
+    
+    // If purpose is Maintenance, also validate clause agreement
+    const purpose = document.getElementById('purpose').value;
+    if(purpose === 'Maintenance') {
+      const agree = document.getElementById('agreeClauses').checked;
+      if(!agree) { 
+        document.getElementById('clauseErrorMsg').innerText = "You must accept the Maintenance Service Provider agreement."; 
+        return false; 
+      }
+      document.getElementById('clauseErrorMsg').innerText = "";
+    }
+    return true;
+  }
+  
+  function getSouthAfricaTimestamp() {
+    const now = new Date();
+    const saTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+    return saTime.toISOString().replace('T', ' ').slice(0, 19);
+  }
+  
+  function gatherFullData() {
+    let data = {
+      fullName: document.getElementById('fullName').value.trim(),
+      contact: document.getElementById('contact').value.trim(),
+      company: document.getElementById('company').value.trim() || "",
+      personToVisit: document.getElementById('personToVisit').value.trim(),
+      purpose: document.getElementById('purpose').value,
+      vehicle: document.getElementById('vehicle').value.trim() || "",
+      notes: document.getElementById('notes').value.trim() || "",
+      timestamp: getSouthAfricaTimestamp(),
+      signatureBase64: getSignatureAsBase64(),
+      signatureDate: document.getElementById('agreementDate').value || new Date().toISOString().slice(0,10),
+      maintenanceAgreementSigned: false,
+      maintenanceClausesAccepted: ""
     };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    // ---- JSONBin Configuration ----
-    const API_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
-    const BIN_ID = '68669b0e8a456b7966babb15';
-    const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
-
-    // ---- CONFIG ----
-    const ADMIN_PASSWORD = 'Superb@123';
-    const COLLECTION_NAME = 'visitors';
-
-    // ---- South Africa Time Helper ----
-    function getSouthAfricaISO() {
-      const now = new Date();
-      const saTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-      return (
-        saTime.getUTCFullYear() + "-" +
-        String(saTime.getUTCMonth() + 1).padStart(2, '0') + "-" +
-        String(saTime.getUTCDate()).padStart(2, '0') + "T" +
-        String(saTime.getUTCHours()).padStart(2, '0') + ":" +
-        String(saTime.getUTCMinutes()).padStart(2, '0') + ":" +
-        String(saTime.getUTCSeconds()).padStart(2, '0')
-      );
+    if(data.purpose === 'Maintenance') {
+      data.maintenanceAgreementSigned = true;
+      data.maintenanceClausesAccepted = "Safe Work Practices, Public Liability, Designated Exit/Entrance, Report to Reception";
     }
-
-    function shortDate(iso) {
-      if (!iso) return "";
-      const parts = iso.split(/[-T:]/);
-      if (parts.length < 6) return iso;
-      const utc = Date.UTC(
-        parseInt(parts[0]),
-        parseInt(parts[1]) - 1,
-        parseInt(parts[2]),
-        parseInt(parts[3]),
-        parseInt(parts[4]),
-        parseInt(parts[5])
-      );
-      const saTime = new Date(utc + 2 * 60 * 60 * 1000);
-      return (
-        saTime.getUTCFullYear() + "-" +
-        String(saTime.getUTCMonth() + 1).padStart(2, "0") + "-" +
-        String(saTime.getUTCDate()).padStart(2, "0") + " " +
-        String(saTime.getUTCHours()).padStart(2, "0") + ":" +
-        String(saTime.getUTCMinutes()).padStart(2, "0")
-      );
+    return data;
+  }
+  
+  async function submitRegistration() {
+    const data = gatherFullData();
+    if(isSignatureEmpty()) { 
+      alert("Signature is required to complete registration."); 
+      return false; 
     }
-
-    // Show loading indicator
-    function showLoading() {
-      document.getElementById('loadingIndicator').classList.add('show');
+    const loading = document.getElementById('loadingToast');
+    loading.style.display = 'block';
+    try {
+      await db.collection(COLLECTION).add(data);
+      loading.style.display = 'none';
+      alert(`✅ Registration Successful!\nVisitor ID: V-${Date.now().toString().slice(-6)}\nTime: ${new Date().toLocaleTimeString()}\nPlease proceed to the reception desk.`);
+      // Reset form
+      document.getElementById('fullName').value = '';
+      document.getElementById('contact').value = '';
+      document.getElementById('company').value = '';
+      document.getElementById('personToVisit').value = '';
+      document.getElementById('purpose').value = '';
+      document.getElementById('vehicle').value = '';
+      document.getElementById('notes').value = '';
+      document.getElementById('agreeClauses').checked = false;
+      if(signaturePad) signaturePad.clear();
+      signatureHistory = [];
+      navigateTo(1);
+      return true;
+    } catch(e) { loading.style.display='none'; alert("Error saving details: "+e.message); return false; }
+  }
+  
+  function renderReview() {
+    const data = gatherFullData();
+    const reviewDiv = document.getElementById('reviewContainer');
+    let maintHtml = '';
+    if(data.purpose === 'Maintenance') {
+      maintHtml = `<div class="review-row" style="background:#fff3df;"><strong>Maintenance Agreement:</strong> <span>Signed & Accepted ✓</span></div>`;
     }
-
-    // Hide loading indicator
-    function hideLoading() {
-      document.getElementById('loadingIndicator').classList.remove('show');
-    }
-
-    // ---- DATE FILTERING ----
-    function filterDataByRange(data, rangeType, startDate = null, endDate = null) {
-      const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const startOfYear = new Date(now.getFullYear(), 0, 1);
-      
-      return data.filter(entry => {
-        if (!entry.timestamp) return false;
-        const entryDate = new Date(entry.timestamp);
-        
-        switch(rangeType) {
-          case 'month':
-            return entryDate >= startOfMonth;
-          case 'life':
-            return entryDate >= startOfYear;
-          case 'custom':
-            if (!startDate || !endDate) return true;
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            end.setHours(23, 59, 59, 999);
-            return entryDate >= start && entryDate <= end;
-          default:
-            return true;
-        }
-      });
-    }
-
-    // ---- EXPORT FUNCTIONS ----
-    function exportToCSV(data) {
-      const fields = ["timestamp","fullName", "company", "purpose", "contact", "personToVisit", "vehicle", "notes"];
-      const csv = [
-        fields.map(f => `"${f.replace(/"/g, '""')}"`).join(","),
-        ...data.map(row =>
-          fields.map(field => {
-            let value = row[field] || "";
-            if (field === "timestamp") {
-              value = shortDate(value);
-            }
-            return `"${value.toString().replace(/"/g, '""')}"`;
-          }).join(",")
-        )
-      ].join("\r\n");
-
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `superb_visitors_${new Date().toISOString().slice(0,10)}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    function exportToPDF(data) {
-      const fields = ["timestamp", "fullName", "company", "purpose", "contact", "personToVisit", "vehicle", "notes"];
-      const fieldNames = ["Date/Time", "Full Name", "Company", "Purpose", "Contact", "Person to Visit", "Vehicle", "Notes"];
-      const rows = data.map(row => [
-          shortDate(row.timestamp),
-          row.fullName || "",
-          row.company || "",
-          row.purpose || "",
-          row.contact || "",
-          row.personToVisit || "",
-          row.vehicle || "",
-          row.notes || ""
-      ]);
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "landscape" });
-      const pageWidth = doc.internal.pageSize.getWidth();
-      doc.setFontSize(16);
-      doc.text("Superb Hyper - Visitor Log", pageWidth/2, 14, { align: "center" });
-      doc.setFontSize(10);
-
-      doc.autoTable({
-        head: [fieldNames],
-        body: rows,
-        startY: 22,
-        theme: 'grid',
-        styles: {
-          fontSize: 8,
-          cellPadding: 1,
-          overflow: 'linebreak',
-          valign: 'top'
-        },
-        columnStyles: {
-            0: { cellWidth: 38 },
-            1: { cellWidth: 38 },
-            2: { cellWidth: 36 },
-            3: { cellWidth: 30 },
-            4: { cellWidth: 34 },
-            5: { cellWidth: 40 },
-            6: { cellWidth: 33 },
-            7: { cellWidth: 48 }
-        },
-        headStyles: {
-            fillColor: [40, 112, 234],
-            textColor: [255, 255, 255],
-            fontStyle: 'bold'
-        },
-        alternateRowStyles: {
-            fillColor: [248, 250, 252]
-        }
-      });
-
-      doc.save(`superb_visitors_${new Date().toISOString().slice(0,10)}.pdf`);
-    }
-
-    // ---- FIRESTORE OPERATIONS ----
-    async function saveVisitorData(data) {
-      try {
-        const docRef = await db.collection(COLLECTION_NAME).add(data);
-        console.log("Document written with ID: ", docRef.id);
-        return true;
-      } catch (error) {
-        console.error("Error adding document: ", error);
-        return false;
+    reviewDiv.innerHTML = `
+      <div class="review-row"><strong>Full Name:</strong> <span>${data.fullName}</span></div>
+      <div class="review-row"><strong>Contact:</strong> <span>${data.contact}</span></div>
+      <div class="review-row"><strong>Company:</strong> <span>${data.company || "—"}</span></div>
+      <div class="review-row"><strong>Person to Visit:</strong> <span>${data.personToVisit}</span></div>
+      <div class="review-row"><strong>Purpose:</strong> <span>${data.purpose}</span></div>
+      <div class="review-row"><strong>Vehicle:</strong> <span>${data.vehicle || "—"}</span></div>
+      <div class="review-row"><strong>Notes:</strong> <span>${data.notes || "—"}</span></div>
+      ${maintHtml}
+    `;
+    const sigPreview = document.getElementById('signaturePreviewArea');
+    if(data.signatureBase64) {
+      let extraText = '';
+      if(data.purpose === 'Maintenance') {
+        extraText = '<br><span style="font-size:0.7rem;">✓ Maintenance clauses accepted</span>';
       }
+      sigPreview.innerHTML = `<div style="background:#f5efe0; border-radius:20px; padding:12px;"><strong><i class="fas fa-signature"></i> Visitor Signature:</strong><br><img src="${data.signatureBase64}" style="max-width:100%; max-height:100px; border:1px solid #d4af37; border-radius:12px; margin-top:8px;"><br><span style="font-size:0.7rem;">Signed on: ${data.signatureDate}</span>${extraText}</div>`;
+    } else {
+      sigPreview.innerHTML = `<div class="error-text">⚠️ Signature missing, please go back to step 3.</div>`;
     }
-
-    async function fetchAllVisitors() {
-      try {
-        const snapshot = await db.collection(COLLECTION_NAME).orderBy('timestamp', 'desc').get();
-        const visitors = [];
-        snapshot.forEach(doc => {
-          visitors.push({ id: doc.id, ...doc.data() });
-        });
-        return visitors;
-      } catch (error) {
-        console.error("Error getting documents: ", error);
-        return [];
-      }
+  }
+  
+  function goNext() {
+    if(currentStep===1 && validateStep1()) { navigateTo(2); return; }
+    if(currentStep===2 && validateStep2()) { 
+      updateMaintenanceClauseVisibility();
+      navigateTo(3); 
+      return; 
     }
-
-    // ---- JSONBIN OPERATIONS ----
-    async function fetchJsonBinData() {
-      try {
-        const res = await fetch(API_URL, {
-          headers: { "X-Master-Key": API_KEY }
-        });
-        if (res.ok) {
-          const json = await res.json();
-          return Array.isArray(json.record) ? json.record : [];
-        } else {
-          console.warn('JSONBin request failed:', res.status, res.statusText);
-          return [];
-        }
-      } catch (err) {
-        console.error('Network error fetching JSONBin data:', err);
-        return [];
-      }
-    }
-
-    // ---- MIGRATION FUNCTION ----
-    async function migrateData() {
-      showLoading();
-      try {
-        // Fetch data from JSONBin
-        const jsonData = await fetchJsonBinData();
-        if (jsonData.length === 0) {
-          document.getElementById('migrationError').textContent = 'No data found in JSONBin to migrate.';
-          document.getElementById('migrationError').style.display = 'block';
-          document.getElementById('migrationSuccess').style.display = 'none';
-          return;
-        }
-
-        // Check if data already exists in Firebase
-        const firebaseData = await fetchAllVisitors();
-        if (firebaseData.length > 0) {
-          // Ask for confirmation if data already exists
-          const confirm = window.confirm(`There are already ${firebaseData.length} records in Firebase. Do you want to proceed with migration? This may create duplicates.`);
-          if (!confirm) {
-            hideLoading();
-            return;
-          }
-        }
-
-        // Migrate data to Firebase
-        const batchSize = 10; // Process in batches to avoid timeouts
-        let successCount = 0;
-        let errorCount = 0;
-
-        for (let i = 0; i < jsonData.length; i += batchSize) {
-          const batch = jsonData.slice(i, i + batchSize);
-          const promises = batch.map(item => saveVisitorData(item));
-          const results = await Promise.all(promises);
-          
-          successCount += results.filter(r => r).length;
-          errorCount += results.filter(r => !r).length;
-        }
-
-        if (errorCount === 0) {
-          document.getElementById('migrationSuccess').style.display = 'block';
-          document.getElementById('migrationError').style.display = 'none';
-        } else {
-          document.getElementById('migrationError').textContent = `Migration completed with ${errorCount} errors. ${successCount} records migrated successfully.`;
-          document.getElementById('migrationError').style.display = 'block';
-          document.getElementById('migrationSuccess').style.display = 'none';
-        }
-      } catch (error) {
-        console.error("Migration error:", error);
-        document.getElementById('migrationError').textContent = 'Migration failed: ' + error.message;
-        document.getElementById('migrationError').style.display = 'block';
-        document.getElementById('migrationSuccess').style.display = 'none';
-      } finally {
-        hideLoading();
-      }
-    }
-
-    // ---- Form Step Management ----
-    let currentStep = 1;
-    const totalSteps = 4;
-    let formData = {};
-
-    // Initialize steps
-    function initSteps() {
-      updateProgressBar();
-      updateStepCircles();
-      
-      // Add event listeners for navigation
-      document.getElementById('next1').addEventListener('click', () => navigateToStep(2));
-      document.getElementById('next2').addEventListener('click', () => navigateToStep(3));
-      document.getElementById('next3').addEventListener('click', () => navigateToStep(4));
-      
-      document.getElementById('prev2').addEventListener('click', () => navigateToStep(1));
-      document.getElementById('prev3').addEventListener('click', () => navigateToStep(2));
-      document.getElementById('prev4').addEventListener('click', () => navigateToStep(3));
-      
-      // Validate before moving to next step
-      document.querySelectorAll('.btn-next').forEach(btn => {
-        btn.addEventListener('click', validateCurrentStep);
-      });
-    }
-
-    function navigateToStep(step) {
-      if (step < 1 || step > totalSteps) return;
-      
-      // Exit current step
-      const currentStepEl = document.getElementById(`step${currentStep}`);
-      currentStepEl.classList.add('exiting');
-      currentStepEl.classList.remove('active');
-      
-      // Update review on step 4
-      if (step === 4) {
-        updateReview();
-      }
-      
-      setTimeout(() => {
-        // Remove exiting class from previous step
-        currentStepEl.classList.remove('exiting');
-        
-        // Show new step
-        const newStepEl = document.getElementById(`step${step}`);
-        newStepEl.classList.add('active');
-        
-        // Update current step
-        currentStep = step;
-        
-        // Update progress indicators
-        updateProgressBar();
-        updateStepCircles();
-        
-        // Focus first input in new step
-        const firstInput = newStepEl.querySelector('input, select, textarea');
-        if (firstInput) firstInput.focus();
-      }, 300);
-    }
-
-    function updateProgressBar() {
-      const progressLine = document.getElementById('progressLine');
-      const progressPercentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
-      progressLine.style.width = `${progressPercentage}%`;
-    }
-
-    function updateStepCircles() {
-      document.querySelectorAll('.step-item').forEach((item, index) => {
-        const stepNumber = index + 1;
-        
-        if (stepNumber < currentStep) {
-          item.classList.add('completed');
-          item.classList.remove('active');
-        } else if (stepNumber === currentStep) {
-          item.classList.add('active');
-          item.classList.remove('completed');
-        } else {
-          item.classList.remove('active', 'completed');
-        }
-      });
-    }
-
-    function validateCurrentStep(e) {
-      const step = currentStep;
-      let isValid = true;
-      
-      switch(step) {
-        case 1:
-          if (!document.getElementById('fullName').value.trim()) {
-            showFieldError('fullName', 'Please enter your full name');
-            isValid = false;
-          }
-          if (!document.getElementById('contact').value.trim()) {
-            showFieldError('contact', 'Please enter your contact number');
-            isValid = false;
-          }
-          break;
-          
-        case 2:
-          if (!document.getElementById('personToVisit').value.trim()) {
-            showFieldError('personToVisit', 'Please enter the person you are visiting');
-            isValid = false;
-          }
-          if (!document.getElementById('purpose').value) {
-            showFieldError('purpose', 'Please select a purpose for your visit');
-            isValid = false;
-          }
-          break;
-          
-        case 3:
-          // All fields optional in step 3
-          break;
-      }
-      
-      if (!isValid) {
-        e.preventDefault();
-        shakeStep();
-      }
-    }
-
-    function showFieldError(fieldId, message) {
-      const field = document.getElementById(fieldId);
-      const formGroup = field.closest('.form-group');
-      
-      // Add error styling
-      field.style.borderColor = 'var(--primary-red)';
-      field.style.boxShadow = '0 0 0 3px rgba(230, 39, 57, 0.1)';
-      
-      // Remove error after 3 seconds
-      setTimeout(() => {
-        field.style.borderColor = '';
-        field.style.boxShadow = '';
-      }, 3000);
-      
-      // Create error tooltip
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'field-error';
-      errorDiv.textContent = message;
-      errorDiv.style.cssText = `
-        color: var(--primary-red);
-        font-size: 14px;
-        margin-top: 5px;
-        font-weight: 500;
-        animation: fadeIn 0.3s ease;
-      `;
-      
-      formGroup.appendChild(errorDiv);
-      setTimeout(() => errorDiv.remove(), 3000);
-    }
-
-    function shakeStep() {
-      const currentStepEl = document.getElementById(`step${currentStep}`);
-      currentStepEl.style.animation = 'shake 0.5s ease';
-      setTimeout(() => {
-        currentStepEl.style.animation = '';
-      }, 500);
-    }
-
-    function updateReview() {
-      // Collect all form data
-      formData.fullName = document.getElementById('fullName').value;
-      formData.contact = document.getElementById('contact').value;
-      formData.company = document.getElementById('company').value || 'Not provided';
-      formData.personToVisit = document.getElementById('personToVisit').value;
-      formData.purpose = document.getElementById('purpose').value;
-      formData.vehicle = document.getElementById('vehicle').value || 'Not provided';
-      formData.notes = document.getElementById('notes').value || 'None';
-      
-      // Update review display
-      document.getElementById('reviewFullName').textContent = formData.fullName;
-      document.getElementById('reviewContact').textContent = formData.contact;
-      document.getElementById('reviewCompany').textContent = formData.company;
-      document.getElementById('reviewPerson').textContent = formData.personToVisit;
-      document.getElementById('reviewPurpose').textContent = formData.purpose;
-      document.getElementById('reviewVehicle').textContent = formData.vehicle;
-      document.getElementById('reviewNotes').textContent = formData.notes;
-    }
-
-    // ---- EVENT HANDLERS ----
-    document.addEventListener('DOMContentLoaded', function() {
-      initSteps();
-      
-      // Form submission
-      document.getElementById('submitForm').addEventListener('click', async function() {
-        // Add timestamp to formData
-        formData.timestamp = getSouthAfricaISO();
-        
-        showLoading();
-        try {
-          const success = await saveVisitorData(formData);
-          if (success) {
-            // Show success message with details
-            document.getElementById('successVisitorId').textContent = 
-              `V-${Date.now().toString().slice(-6)}`;
-            document.getElementById('successTime').textContent = 
-              new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            const successMsg = document.getElementById('successMessage');
-            successMsg.classList.add('show');
-            
-            // Reset form after 5 seconds
-            setTimeout(() => {
-              successMsg.classList.remove('show');
-              resetForm();
-              navigateToStep(1);
-            }, 5000);
-          } else {
-            alert("Error saving your details. Please try again.");
-          }
-        } catch (error) {
-          console.error("Submission error:", error);
-          alert("Error saving your details. Please try again.");
-        } finally {
-          hideLoading();
-        }
-      });
-
-      function resetForm() {
-        document.getElementById('fullName').value = '';
-        document.getElementById('contact').value = '';
-        document.getElementById('company').value = '';
-        document.getElementById('personToVisit').value = '';
-        document.getElementById('purpose').value = '';
-        document.getElementById('vehicle').value = '';
-        document.getElementById('notes').value = '';
-        formData = {};
-      }
-
-      // ---- MODAL ELEMENTS ----
-      const exportModal = document.getElementById('exportModal');
-      const passwordModal = document.getElementById('passwordModal');
-      const migrationModal = document.getElementById('migrationModal');
-      const customDateFields = document.getElementById('customDateFields');
-      const passwordError = document.getElementById('passwordError');
-      const adminPasswordInput = document.getElementById('adminPassword');
-      
-      // ---- PASSWORD PROTECTION ----
-      let exportFormat = '';
-      
-      // Show password modal when export is initiated
-      document.getElementById('exportCSV').onclick = () => {
-        exportFormat = 'csv';
-        passwordModal.classList.add('show');
-        adminPasswordInput.value = '';
-        passwordError.style.display = 'none';
-        adminPasswordInput.focus();
-      };
-      
-      document.getElementById('exportPDF').onclick = () => {
-        exportFormat = 'pdf';
-        passwordModal.classList.add('show');
-        adminPasswordInput.value = '';
-        passwordError.style.display = 'none';
-        adminPasswordInput.focus();
-      };
-      
-      // Handle password confirmation
-      document.getElementById('confirmPassword').onclick = async () => {
-        const enteredPassword = adminPasswordInput.value;
-        if (enteredPassword === ADMIN_PASSWORD) {
-          passwordModal.classList.remove('show');
-          exportModal.classList.add('show');
-        } else {
-          passwordError.style.display = 'block';
-          adminPasswordInput.value = '';
-          adminPasswordInput.focus();
-        }
-      };
-      
-      // Cancel password modal
-      document.getElementById('cancelPassword').onclick = () => {
-        passwordModal.classList.remove('show');
-      };
-      
-      // Allow Enter key in password field
-      adminPasswordInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          document.getElementById('confirmPassword').click();
-        }
-      });
-      
-      // ---- DATE RANGE OPTIONS ----
-      document.getElementById('customRange').onchange = () => {
-        customDateFields.style.display = 'flex';
-        // Set default dates to current month
-        const today = new Date();
-        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-        document.getElementById('startDate').valueAsDate = firstDay;
-        document.getElementById('endDate').valueAsDate = today;
-      };
-      
-      document.querySelectorAll('input[name="dateRange"]').forEach(input => {
-        if (input.value !== 'custom') {
-          input.onchange = () => {
-            customDateFields.style.display = 'none';
-          };
-        }
-      });
-
-      // ---- EXPORT CONFIRMATION ----
-      document.getElementById('confirmExport').onclick = async () => {
-        const selectedRange = document.querySelector('input[name="dateRange"]:checked').value;
-        let startDate = null;
-        let endDate = null;
-        
-        if (selectedRange === 'custom') {
-          startDate = document.getElementById('startDate').value;
-          endDate = document.getElementById('endDate').value;
-          if (!startDate || !endDate) {
-            alert('Please select both start and end dates');
-            return;
-          }
-        }
-        
-        showLoading();
-        try {
-          const data = await fetchAllVisitors();
-          const filteredData = filterDataByRange(data, selectedRange, startDate, endDate);
-          
-          if (filteredData.length === 0) {
-            alert("No visitor records match the selected criteria.");
-            hideLoading();
-            return;
-          }
-          
-          // Export based on format
-          if (exportFormat === 'csv') {
-            exportToCSV(filteredData);
-          } else {
-            exportToPDF(filteredData);
-          }
-          
-          exportModal.classList.remove('show');
-        } catch (error) {
-          console.error("Export error:", error);
-          alert("Error exporting data. Please try again.");
-        } finally {
-          hideLoading();
-        }
-      };
-
-      // ---- MODAL CANCEL BUTTONS ----
-      document.getElementById('cancelExport').onclick = () => {
-        exportModal.classList.remove('show');
-      };
-
-      // ---- MIGRATION MODAL ----
-      document.getElementById('migrateData').onclick = () => {
-        migrationModal.classList.add('show');
-        document.getElementById('migrationSuccess').style.display = 'none';
-        document.getElementById('migrationError').style.display = 'none';
-      };
-
-      document.getElementById('confirmMigration').onclick = async () => {
-        await migrateData();
-      };
-
-      document.getElementById('cancelMigration').onclick = () => {
-        migrationModal.classList.remove('show');
-      };
-
-      // Close modals when clicking outside
-      window.onclick = function(event) {
-        if (event.target === exportModal) {
-          exportModal.classList.remove('show');
-        }
-        if (event.target === passwordModal) {
-          passwordModal.classList.remove('show');
-        }
-        if (event.target === migrationModal) {
-          migrationModal.classList.remove('show');
-        }
-      };
+    if(currentStep===3 && validateStep3()) { navigateTo(4); renderReview(); return; }
+    if(currentStep===4) { submitRegistration(); }
+  }
+  
+  function goPrev() {
+    if(currentStep===2) navigateTo(1);
+    else if(currentStep===3) navigateTo(2);
+    else if(currentStep===4) navigateTo(3);
+  }
+  
+  // Export Functions with Signatures in PDF
+  async function fetchAllVisitors() { const snap = await db.collection(COLLECTION).orderBy('timestamp','desc').get(); return snap.docs.map(d=>d.data()); }
+  function filterByRange(data, range, start, end) { 
+    const now=new Date();
+    return data.filter(d=>{ 
+      let date=new Date(d.timestamp); 
+      if(range==='month') return date>=new Date(now.getFullYear(),now.getMonth(),1); 
+      if(range==='custom' && start && end) return date>=new Date(start) && date<=new Date(end); 
+      return true;
     });
-
-    // ---- Register service worker for PWA ----
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        fetch('service-worker.js', { method: 'HEAD' })
-          .then(response => {
-            if (response.ok) {
-              navigator.serviceWorker.register('service-worker.js');
-            } else {
-              console.log('Service worker file not found, skipping registration');
-            }
-          })
-          .catch(error => {
-            console.log('Error checking for service worker:', error);
-          });
-      });
+  }
+  
+  function exportCSV(data) {
+    let headers = ["timestamp","fullName","contact","company","personToVisit","purpose","vehicle","notes","signatureDate","maintenanceAgreementSigned"];
+    let rows = data.map(r => headers.map(h => {
+      return `"${(r[h]?.toString().replace(/"/g,'""') || "")}"`;
+    }).join(","));
+    let csv = [headers.join(","), ...rows].join("\n");
+    let blob = new Blob([csv], {type:"text/csv"}); let a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="superb_visitors.csv"; a.click();
+  }
+  
+  async function exportPDFWithSignatures(data) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm" });
+    let y = 20;
+    doc.setFontSize(18); doc.text("SUPERB HYPER - VISITOR REGISTRATION LOG", 105, y, { align: "center" }); y+=10;
+    doc.setFontSize(9); doc.text(`Generated: ${new Date().toLocaleString()}`, 105, y, { align: "center" }); y+=8;
+    for (let i=0; i<data.length; i++) {
+      if (y > 250) { doc.addPage(); y=20; }
+      const v = data[i];
+      doc.setFontSize(11); doc.text(`Visitor #${i+1}`, 15, y); y+=6;
+      doc.setFontSize(9);
+      doc.text(`Name: ${v.fullName || ""} | Contact: ${v.contact || ""}`, 15, y); y+=5;
+      doc.text(`Company: ${v.company || "-"} | Purpose: ${v.purpose || ""}`, 15, y); y+=5;
+      doc.text(`Person to visit: ${v.personToVisit || ""} | Vehicle: ${v.vehicle || "-"}`, 15, y); y+=5;
+      doc.text(`Time: ${v.timestamp || ""}`, 15, y); y+=6;
+      if(v.signatureBase64) {
+        doc.text("✓ Visitor Signature:", 15, y); y+=4;
+        try {
+          const imgData = v.signatureBase64;
+          const imgWidth = 45; const imgHeight = 18;
+          doc.addImage(imgData, 'PNG', 15, y, imgWidth, imgHeight);
+          y += imgHeight + 3;
+          doc.text(`Signed: ${v.signatureDate || ""}`, 15, y); y+=5;
+        } catch(e) { doc.text("Signature data unavailable", 15, y); y+=6; }
+      } else {
+        doc.text("No signature recorded", 15, y); y+=5;
+      }
+      if(v.purpose === "Maintenance" && v.maintenanceAgreementSigned) {
+        doc.text("✔ MAINTENANCE CLAUSES ACCEPTED (Provider Agreement)", 15, y); y+=5;
+      }
+      doc.line(15, y, 195, y); y+=6;
+      if (y > 260 && i !== data.length-1) { doc.addPage(); y=20; }
     }
-  </script>
+    doc.save("superb_visitor_log.pdf");
+  }
+  
+  // Admin & Export Modal
+  let pendingExportType = null;
+  function showPasswordModal(cb) { 
+    const modal=document.getElementById('passwordModal'); 
+    modal.classList.add('active'); 
+    document.getElementById('confirmPassModal').onclick=()=>{ 
+      if(document.getElementById('adminPass').value===ADMIN_PASSWORD){ 
+        modal.classList.remove('active'); 
+        cb(); 
+      } else { 
+        document.getElementById('passError').innerText="Incorrect password"; 
+      } 
+    }; 
+    document.getElementById('cancelPassModal').onclick=()=>{ modal.classList.remove('active'); }; 
+  }
+  document.getElementById('exportCsvBtn').onclick=()=>{ pendingExportType='csv'; showPasswordModal(()=>{ document.getElementById('exportModal').classList.add('active'); }); };
+  document.getElementById('exportPdfBtn').onclick=()=>{ pendingExportType='pdf'; showPasswordModal(()=>{ document.getElementById('exportModal').classList.add('active'); }); };
+  document.getElementById('confirmExportAction').onclick=async()=>{ 
+    let range=document.querySelector('input[name="range"]:checked').value; 
+    let start=null,end=null; 
+    if(range==='custom'){ 
+      start=document.getElementById('startDateCustom').value; 
+      end=document.getElementById('endDateCustom').value; 
+      if(!start||!end){ alert("Please select both start and end dates"); return; } 
+    } 
+    const all=await fetchAllVisitors(); 
+    let filtered=filterByRange(all,range,start,end); 
+    if(!filtered.length){ alert("No visitor records match the selected criteria."); return; } 
+    if(pendingExportType==='csv') exportCSV(filtered); 
+    else await exportPDFWithSignatures(filtered); 
+    document.getElementById('exportModal').classList.remove('active'); 
+  };
+  document.getElementById('cancelExportModal').onclick=()=>{ document.getElementById('exportModal').classList.remove('active'); };
+  document.querySelectorAll('input[name="range"]').forEach(r=>{ r.addEventListener('change',()=>{ document.getElementById('customDateDiv').style.display = (r.value==='custom')?'block':'none'; }); });
+  document.getElementById('migrateBtn').onclick=()=>{ document.getElementById('migrationModal').classList.add('active'); };
+  document.getElementById('doMigration').onclick=async()=>{ 
+    const loadingDiv=document.getElementById('loadingToast'); 
+    loadingDiv.style.display='block'; 
+    try{ 
+      let res=await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{"X-Master-Key":API_KEY}}); 
+      let json=await res.json(); 
+      let records=Array.isArray(json.record)?json.record:[]; 
+      for(let rec of records){ 
+        await db.collection(COLLECTION).add({...rec, signatureBase64: null, maintenanceAgreementSigned: false}); 
+      } 
+      alert(`Successfully migrated ${records.length} records to Firebase.`); 
+    }catch(e){ alert("Migration failed: "+e.message); } 
+    finally{ loadingDiv.style.display='none'; document.getElementById('migrationModal').classList.remove('active'); } 
+  };
+  document.getElementById('cancelMigrationModal').onclick=()=>{ document.getElementById('migrationModal').classList.remove('active'); };
+  
+  // Event Listeners
+  document.getElementById('nextStep1').addEventListener('click', goNext);
+  document.getElementById('nextStep2').addEventListener('click', goNext);
+  document.getElementById('nextStep3').addEventListener('click', goNext);
+  document.getElementById('prevStep2').addEventListener('click', goPrev);
+  document.getElementById('prevStep3').addEventListener('click', goPrev);
+  document.getElementById('prevStep4').addEventListener('click', goPrev);
+  document.getElementById('submitFinal').addEventListener('click', goNext);
+  document.getElementById('purpose').addEventListener('change', updateMaintenanceClauseVisibility);
+  document.getElementById('agreementDate').valueAsDate = new Date();
+  
+  window.onload = () => { initSignaturePad(); updateStepUI(); updateMaintenanceClauseVisibility(); };
+</script>
 </body>
 </html>
