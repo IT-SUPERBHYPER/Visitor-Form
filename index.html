@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Superb Hyper | Visitor Registration Portal</title>
   <meta name="theme-color" content="#1a1f36">
   <!-- Font Awesome, Google Fonts, Signature Pad, jsPDF, Firebase -->
@@ -72,7 +75,6 @@
     .modal-overlay.active { visibility: visible; opacity: 1; }
     .modal-content { background: white; border-radius: 32px; max-width: 460px; width: 90%; padding: 2rem; }
     .error-text { color: #c2410c; font-size: 0.7rem; margin-top: 5px; }
-    .warning-badge { background: #fef3c7; color: #b45309; border-radius: 20px; padding: 8px 12px; font-size: 0.7rem; margin-top: 8px; display: inline-block; }
     @keyframes fadeSlide { from { opacity:0; transform: translateY(10px);} to { opacity:1; transform: translateY(0);} }
     .form-step { animation: fadeSlide 0.3s ease; }
     @media (max-width: 550px) { .form-panel { padding: 1.5rem; } .btn-group { flex-direction: column; } }
@@ -92,7 +94,6 @@
     <div class="step" data-step="4"><div class="circle">4</div><span>Confirmation</span></div>
   </div>
   <div class="glass-card">
-    <!-- Step 1: Personal Information -->
     <div id="step1" class="form-panel form-step">
       <h3><i class="fas fa-id-card"></i> Personal Information</h3>
       <div class="form-group"><label><i class="fas fa-user"></i> Full Name *</label><input type="text" id="fullName" placeholder="Enter your full name"></div>
@@ -100,7 +101,6 @@
       <div class="form-group"><label><i class="fas fa-building"></i> Company / Organisation</label><input type="text" id="company" placeholder="Company name (optional)"></div>
       <div class="btn-group"><div></div><button class="btn-primary" id="nextStep1">Next <i class="fas fa-arrow-right"></i></button></div>
     </div>
-    <!-- Step 2: Visit Details -->
     <div id="step2" class="form-panel form-step" style="display:none;">
       <h3><i class="fas fa-calendar-check"></i> Visit Details</h3>
       <div class="form-group"><label><i class="fas fa-user-tie"></i> Person to Visit *</label><input type="text" id="personToVisit" placeholder="Who are you visiting?"></div>
@@ -116,28 +116,23 @@
         </select>
       </div>
       <div class="form-group"><label><i class="fas fa-car"></i> Vehicle Registration</label><input type="text" id="vehicle" placeholder="Vehicle plate number (optional)"></div>
-      <div class="form-group"><label><i class="fas fa-sticky-note"></i> Additional Notes</label><textarea id="notes" rows="2" placeholder="Any special requirements or additional information..."></textarea></div>
+      <div class="form-group"><label><i class="fas fa-sticky-note"></i> Additional Notes</label><textarea id="notes" rows="2" placeholder="Any special requirements..."></textarea></div>
       <div class="btn-group"><button class="btn-secondary" id="prevStep2"><i class="fas fa-arrow-left"></i> Back</button><button class="btn-primary" id="nextStep2">Next →</button></div>
     </div>
-    <!-- Step 3: Signature (for ALL visitors) + Maintenance Clause (only shown if purpose = Maintenance) -->
     <div id="step3" class="form-panel form-step" style="display:none;">
       <h3><i class="fas fa-signature"></i> Digital Signature</h3>
       <p style="font-size:0.8rem; color:#4a5568; margin-bottom:1rem;">Please sign below to confirm your visit registration.</p>
-      
-      <!-- Maintenance Clause Panel - ONLY VISIBLE when purpose is Maintenance -->
       <div id="maintenanceClausePanel" style="display:none;">
         <div class="legal-clause">
           <p><i class="fas fa-hard-hat"></i> <strong>Maintenance Service Provider Agreement</strong></p>
-          <p>1. <strong>Safe Work Practices</strong> – Service Providers must ensure all Safe Work Practices are observed (working at heights, equipment use, power tools, signage).</p>
-          <p>2. <strong>Public Liability</strong> – Superb Hyper will not be held liable for any issues with Team Members or the public whilst you work on site.</p>
-          <p>3. <strong>Designated Exit & Entrance</strong> – Use designated points; security searches may be conducted if necessary.</p>
-          <p>4. <strong>Report to Reception</strong> – Report to reception upon arrival and before leaving. A register will be produced for completion.</p>
+          <p>1. <strong>Safe Work Practices</strong> – All Safe Work Practices must be observed (working at heights, equipment use, power tools, signage).</p>
+          <p>2. <strong>Public Liability</strong> – Superb Hyper not liable for incidents with Team Members or public during works.</p>
+          <p>3. <strong>Designated Exit & Entrance</strong> – Use designated points; security searches may be conducted.</p>
+          <p>4. <strong>Report to Reception</strong> – Report to reception upon arrival and departure. Register must be completed.</p>
         </div>
-        <div class="checkbox-row"><input type="checkbox" id="agreeClauses"> <label for="agreeClauses" style="font-weight:700;">I have read, understood and agree to abide by all Maintenance Service Provider rules and safety protocols.</label></div>
+        <div class="checkbox-row"><input type="checkbox" id="agreeClauses"> <label for="agreeClauses" style="font-weight:700;">I have read, understood and agree to abide by all Maintenance Service Provider rules.</label></div>
         <div class="error-text" id="clauseErrorMsg"></div>
       </div>
-      
-      <!-- Signature Pad - For ALL visitors -->
       <div class="form-group" style="margin-top: 10px;">
         <label><i class="fas fa-pen-fancy"></i> Your Signature (draw below) *</label>
         <div class="signature-container">
@@ -150,10 +145,8 @@
         <div class="error-text" id="sigErrorMsg"></div>
       </div>
       <div class="form-group"><label><i class="fas fa-calendar-alt"></i> Date of signing</label><input type="date" id="agreementDate"></div>
-      
-      <div class="btn-group"><button class="btn-secondary" id="prevStep3"><i class="fas fa-arrow-left"></i> Back</button><button class="btn-primary" id="nextStep3">Review & Submit →</button></div>
+      <div class="btn-group"><button class="btn-secondary" id="prevStep3"><i class="fas fa-arrow-left"></i> Back</button><button class="btn-primary" id="nextStep3">Review →</button></div>
     </div>
-    <!-- Step 4: Confirmation with signature preview -->
     <div id="step4" class="form-panel form-step" style="display:none;">
       <h3><i class="fas fa-check-circle"></i> Review & Submit</h3>
       <div class="review-card" id="reviewContainer"></div>
@@ -162,330 +155,264 @@
     </div>
   </div>
   <div class="footer-actions">
-    <div class="action-icon" id="exportCsvBtn"><i class="fas fa-file-csv"></i> Export CSV</div>
-    <div class="action-icon" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Export PDF (with Signatures)</div>
+    <div class="action-icon" id="exportCsvBtn"><i class="fas fa-file-csv"></i> CSV</div>
+    <div class="action-icon" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> PDF (with Signatures)</div>
     <div class="action-icon" id="migrateBtn"><i class="fas fa-database"></i> Migrate Data</div>
   </div>
 </div>
 
-<!-- Modals -->
-<div id="passwordModal" class="modal-overlay"><div class="modal-content"><h3><i class="fas fa-lock"></i> Admin Authentication</h3><input type="password" id="adminPass" placeholder="Enter admin password"><div id="passError" style="color:red;font-size:0.8rem;"></div><div class="btn-group"><button id="cancelPassModal" class="btn-secondary">Cancel</button><button id="confirmPassModal" class="btn-primary">Confirm</button></div></div></div>
+<div id="passwordModal" class="modal-overlay"><div class="modal-content"><h3><i class="fas fa-lock"></i> Admin Authentication</h3><input type="password" id="adminPass" placeholder="Admin password"><div id="passError" style="color:red;font-size:0.8rem;"></div><div class="btn-group"><button id="cancelPassModal" class="btn-secondary">Cancel</button><button id="confirmPassModal" class="btn-primary">Confirm</button></div></div></div>
 <div id="exportModal" class="modal-overlay"><div class="modal-content"><h3>Export Visitor Records</h3><div><label><input type="radio" name="range" value="all" checked> All Data</label></div><div><label><input type="radio" name="range" value="month"> Month to Date</label></div><div><label><input type="radio" name="range" value="custom"> Custom Range</label><div id="customDateDiv" style="display:none; margin-top:8px;"><input type="date" id="startDateCustom"><input type="date" id="endDateCustom" style="margin-top:8px;"></div></div><div class="btn-group"><button id="cancelExportModal" class="btn-secondary">Cancel</button><button id="confirmExportAction" class="btn-primary">Export</button></div></div></div>
-<div id="migrationModal" class="modal-overlay"><div class="modal-content"><h3>Data Migration</h3><p>Migrate existing visitor data from JSONBin to Firebase (signatures will be stored).</p><button id="doMigration" class="btn-primary">Start Migration</button><button id="cancelMigrationModal" class="btn-secondary" style="margin-left:8px;">Close</button><div id="migrateStatus"></div></div></div>
+<div id="migrationModal" class="modal-overlay"><div class="modal-content"><h3>Data Migration</h3><p>Migrate existing visitor data from JSONBin to Firebase.</p><button id="doMigration" class="btn-primary">Start Migration</button><button id="cancelMigrationModal" class="btn-secondary" style="margin-left:8px;">Close</button><div id="migrateStatus"></div></div></div>
 <div id="loadingToast" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1a2c3e; color:white; padding:8px 20px; border-radius:40px; z-index:2000; display:none;">Processing...</div>
 
 <script>
-  // Firebase Configuration
-  const firebaseConfig = { apiKey: "AIzaSyD3HcG5FIr_5hQDKOzrKuEGZNA4EQeu2HU", authDomain: "visitor-form-f6ae9.firebaseapp.com", projectId: "visitor-form-f6ae9", storageBucket: "visitor-form-f6ae9.firebasestorage.app", messagingSenderId: "140839989587", appId: "1:140839989587:web:63e4f2add9eeedaa0431a6", measurementId: "G-VLP8XN6XE6" };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const COLLECTION = "visitors";
+  (function() {
+    const firebaseConfig = { apiKey: "AIzaSyD3HcG5FIr_5hQDKOzrKuEGZNA4EQeu2HU", authDomain: "visitor-form-f6ae9.firebaseapp.com", projectId: "visitor-form-f6ae9", storageBucket: "visitor-form-f6ae9.firebasestorage.app", messagingSenderId: "140839989587", appId: "1:140839989587:web:63e4f2add9eeedaa0431a6", measurementId: "G-VLP8XN6XE6" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const COLLECTION = "visitors";
+    const API_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
+    const BIN_ID = '68669b0e8a456b7966babb15';
+    const ADMIN_PASSWORD = 'Superb@123';
 
-  // JSONBin Config
-  const API_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
-  const BIN_ID = '68669b0e8a456b7966babb15';
-  const ADMIN_PASSWORD = 'Superb@123';
+    let signaturePad = null;
+    let signatureHistory = [];
+    let currentStep = 1;
+    const stepPanels = {1: document.getElementById('step1'), 2: document.getElementById('step2'), 3: document.getElementById('step3'), 4: document.getElementById('step4')};
 
-  // Signature Pad
-  let signaturePad = null;
-  let signatureHistory = [];
-  
-  function initSignaturePad() {
-    const canvas = document.getElementById('signatureCanvas');
-    if(!canvas) return;
-    canvas.width = canvas.offsetWidth || 500;
-    canvas.height = 140;
-    signaturePad = new SignaturePad(canvas, { backgroundColor: 'rgb(255,255,255)', penColor: '#1e293b' });
-    signaturePad.addEventListener("end", () => { saveStateToHistory(); });
-    document.getElementById('clearSignatureBtn').onclick = () => { signaturePad.clear(); signatureHistory = []; };
-    document.getElementById('undoSignatureBtn').onclick = () => { undoSignature(); };
-  }
-  function saveStateToHistory() { if(signaturePad && !signaturePad.isEmpty()) { const data = signaturePad.toData(); signatureHistory.push(data); if(signatureHistory.length>10) signatureHistory.shift(); } }
-  function undoSignature() { if(signatureHistory.length>0) { const lastState = signatureHistory.pop(); signaturePad.fromData(lastState); } else { signaturePad.clear(); } }
-  function getSignatureAsBase64() { if(signaturePad && !signaturePad.isEmpty()) return signaturePad.toDataURL(); return null; }
-  function isSignatureEmpty() { return !signaturePad || signaturePad.isEmpty(); }
-
-  // Step Management
-  let currentStep = 1;
-  const stepPanels = {1: document.getElementById('step1'), 2: document.getElementById('step2'), 3: document.getElementById('step3'), 4: document.getElementById('step4')};
-  
-  function updateStepUI() {
-    for(let i=1;i<=4;i++) { stepPanels[i].style.display = (i===currentStep) ? 'block' : 'none'; }
-    document.querySelectorAll('.step').forEach((el,idx)=>{ if(idx+1 < currentStep) el.classList.add('completed'); else el.classList.remove('completed'); if(idx+1===currentStep) el.classList.add('active'); else el.classList.remove('active'); });
-  }
-  function navigateTo(step) { if(step>=1 && step<=4) { currentStep=step; updateStepUI(); } }
-  
-  // Update maintenance clause visibility based on purpose
-  function updateMaintenanceClauseVisibility() {
-    const purpose = document.getElementById('purpose').value;
-    const clausePanel = document.getElementById('maintenanceClausePanel');
-    if(purpose === 'Maintenance') {
-      clausePanel.style.display = 'block';
-    } else {
-      clausePanel.style.display = 'none';
-      // Uncheck agreement when hidden
-      document.getElementById('agreeClauses').checked = false;
-      document.getElementById('clauseErrorMsg').innerText = '';
+    function initSignaturePad() {
+      const canvas = document.getElementById('signatureCanvas');
+      if(!canvas) return;
+      canvas.width = canvas.offsetWidth || 500;
+      canvas.height = 140;
+      signaturePad = new SignaturePad(canvas, { backgroundColor: 'rgb(255,255,255)', penColor: '#1e293b' });
+      signaturePad.addEventListener("end", () => { saveStateToHistory(); });
+      const clearBtn = document.getElementById('clearSignatureBtn');
+      const undoBtn = document.getElementById('undoSignatureBtn');
+      if(clearBtn) clearBtn.onclick = () => { signaturePad.clear(); signatureHistory = []; };
+      if(undoBtn) undoBtn.onclick = () => { if(signatureHistory.length>0) { const lastState = signatureHistory.pop(); signaturePad.fromData(lastState); } else { signaturePad.clear(); } };
     }
-  }
-  
-  function validateStep1() { 
-    let name=document.getElementById('fullName').value.trim(); 
-    let contact=document.getElementById('contact').value.trim(); 
-    if(!name){ alert("Please enter your full name"); return false; } 
-    if(!contact){ alert("Please enter your contact number"); return false; } 
-    return true; 
-  }
-  function validateStep2() { 
-    let person=document.getElementById('personToVisit').value.trim(); 
-    let purp=document.getElementById('purpose').value; 
-    if(!person){ alert("Please enter the person you are visiting"); return false; } 
-    if(!purp){ alert("Please select a purpose for your visit"); return false; } 
-    return true; 
-  }
-  function validateStep3() {
-    // Signature required for ALL visitors
-    if(isSignatureEmpty()) { 
-      document.getElementById('sigErrorMsg').innerText = "Signature required. Please draw your signature above."; 
-      return false; 
+    function saveStateToHistory() { if(signaturePad && !signaturePad.isEmpty()) { signatureHistory.push(signaturePad.toData()); if(signatureHistory.length>10) signatureHistory.shift(); } }
+    function getSignatureAsBase64() { return (signaturePad && !signaturePad.isEmpty()) ? signaturePad.toDataURL() : null; }
+    function isSignatureEmpty() { return !signaturePad || signaturePad.isEmpty(); }
+
+    function updateStepUI() {
+      for(let i=1;i<=4;i++) { if(stepPanels[i]) stepPanels[i].style.display = (i===currentStep) ? 'block' : 'none'; }
+      document.querySelectorAll('.step').forEach((el,idx)=>{ 
+        if(idx+1 < currentStep) el.classList.add('completed'); else el.classList.remove('completed'); 
+        if(idx+1===currentStep) el.classList.add('active'); else el.classList.remove('active'); 
+      });
     }
-    document.getElementById('sigErrorMsg').innerText = "";
+    function navigateTo(step) { if(step>=1 && step<=4) { currentStep=step; updateStepUI(); } }
     
-    // If purpose is Maintenance, also validate clause agreement
-    const purpose = document.getElementById('purpose').value;
-    if(purpose === 'Maintenance') {
-      const agree = document.getElementById('agreeClauses').checked;
-      if(!agree) { 
-        document.getElementById('clauseErrorMsg').innerText = "You must accept the Maintenance Service Provider agreement."; 
+    function updateMaintenanceClauseVisibility() {
+      const purpose = document.getElementById('purpose').value;
+      const clausePanel = document.getElementById('maintenanceClausePanel');
+      if(clausePanel) clausePanel.style.display = (purpose === 'Maintenance') ? 'block' : 'none';
+    }
+    
+    function validateStep1() { 
+      let name = document.getElementById('fullName')?.value.trim(); 
+      let contact = document.getElementById('contact')?.value.trim(); 
+      if(!name){ alert("Please enter your full name"); return false; } 
+      if(!contact){ alert("Please enter your contact number"); return false; } 
+      return true; 
+    }
+    function validateStep2() { 
+      let person = document.getElementById('personToVisit')?.value.trim(); 
+      let purp = document.getElementById('purpose')?.value; 
+      if(!person){ alert("Please enter the person you are visiting"); return false; } 
+      if(!purp){ alert("Please select a purpose for your visit"); return false; } 
+      return true; 
+    }
+    function validateStep3() {
+      if(isSignatureEmpty()) { 
+        let err = document.getElementById('sigErrorMsg');
+        if(err) err.innerText = "Signature required. Please draw your signature above."; 
         return false; 
       }
-      document.getElementById('clauseErrorMsg').innerText = "";
-    }
-    return true;
-  }
-  
-  function getSouthAfricaTimestamp() {
-    const now = new Date();
-    const saTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-    return saTime.toISOString().replace('T', ' ').slice(0, 19);
-  }
-  
-  function gatherFullData() {
-    let data = {
-      fullName: document.getElementById('fullName').value.trim(),
-      contact: document.getElementById('contact').value.trim(),
-      company: document.getElementById('company').value.trim() || "",
-      personToVisit: document.getElementById('personToVisit').value.trim(),
-      purpose: document.getElementById('purpose').value,
-      vehicle: document.getElementById('vehicle').value.trim() || "",
-      notes: document.getElementById('notes').value.trim() || "",
-      timestamp: getSouthAfricaTimestamp(),
-      signatureBase64: getSignatureAsBase64(),
-      signatureDate: document.getElementById('agreementDate').value || new Date().toISOString().slice(0,10),
-      maintenanceAgreementSigned: false,
-      maintenanceClausesAccepted: ""
-    };
-    if(data.purpose === 'Maintenance') {
-      data.maintenanceAgreementSigned = true;
-      data.maintenanceClausesAccepted = "Safe Work Practices, Public Liability, Designated Exit/Entrance, Report to Reception";
-    }
-    return data;
-  }
-  
-  async function submitRegistration() {
-    const data = gatherFullData();
-    if(isSignatureEmpty()) { 
-      alert("Signature is required to complete registration."); 
-      return false; 
-    }
-    const loading = document.getElementById('loadingToast');
-    loading.style.display = 'block';
-    try {
-      await db.collection(COLLECTION).add(data);
-      loading.style.display = 'none';
-      alert(`✅ Registration Successful!\nVisitor ID: V-${Date.now().toString().slice(-6)}\nTime: ${new Date().toLocaleTimeString()}\nPlease proceed to the reception desk.`);
-      // Reset form
-      document.getElementById('fullName').value = '';
-      document.getElementById('contact').value = '';
-      document.getElementById('company').value = '';
-      document.getElementById('personToVisit').value = '';
-      document.getElementById('purpose').value = '';
-      document.getElementById('vehicle').value = '';
-      document.getElementById('notes').value = '';
-      document.getElementById('agreeClauses').checked = false;
-      if(signaturePad) signaturePad.clear();
-      signatureHistory = [];
-      navigateTo(1);
+      let purpose = document.getElementById('purpose')?.value;
+      if(purpose === 'Maintenance') {
+        let agree = document.getElementById('agreeClauses')?.checked;
+        if(!agree) { 
+          let clauseErr = document.getElementById('clauseErrorMsg');
+          if(clauseErr) clauseErr.innerText = "You must accept the Maintenance Service Provider agreement."; 
+          return false; 
+        }
+      }
       return true;
-    } catch(e) { loading.style.display='none'; alert("Error saving details: "+e.message); return false; }
-  }
-  
-  function renderReview() {
-    const data = gatherFullData();
-    const reviewDiv = document.getElementById('reviewContainer');
-    let maintHtml = '';
-    if(data.purpose === 'Maintenance') {
-      maintHtml = `<div class="review-row" style="background:#fff3df;"><strong>Maintenance Agreement:</strong> <span>Signed & Accepted ✓</span></div>`;
     }
-    reviewDiv.innerHTML = `
-      <div class="review-row"><strong>Full Name:</strong> <span>${data.fullName}</span></div>
-      <div class="review-row"><strong>Contact:</strong> <span>${data.contact}</span></div>
-      <div class="review-row"><strong>Company:</strong> <span>${data.company || "—"}</span></div>
-      <div class="review-row"><strong>Person to Visit:</strong> <span>${data.personToVisit}</span></div>
-      <div class="review-row"><strong>Purpose:</strong> <span>${data.purpose}</span></div>
-      <div class="review-row"><strong>Vehicle:</strong> <span>${data.vehicle || "—"}</span></div>
-      <div class="review-row"><strong>Notes:</strong> <span>${data.notes || "—"}</span></div>
-      ${maintHtml}
-    `;
-    const sigPreview = document.getElementById('signaturePreviewArea');
-    if(data.signatureBase64) {
-      let extraText = '';
+    
+    function getSouthAfricaTimestamp() {
+      const now = new Date();
+      const saTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+      return saTime.toISOString().replace('T', ' ').slice(0, 19);
+    }
+    
+    function gatherFullData() {
+      let data = {
+        fullName: document.getElementById('fullName')?.value.trim() || "",
+        contact: document.getElementById('contact')?.value.trim() || "",
+        company: document.getElementById('company')?.value.trim() || "",
+        personToVisit: document.getElementById('personToVisit')?.value.trim() || "",
+        purpose: document.getElementById('purpose')?.value || "",
+        vehicle: document.getElementById('vehicle')?.value.trim() || "",
+        notes: document.getElementById('notes')?.value.trim() || "",
+        timestamp: getSouthAfricaTimestamp(),
+        signatureBase64: getSignatureAsBase64(),
+        signatureDate: document.getElementById('agreementDate')?.value || new Date().toISOString().slice(0,10),
+        maintenanceAgreementSigned: false,
+        maintenanceClausesAccepted: ""
+      };
       if(data.purpose === 'Maintenance') {
-        extraText = '<br><span style="font-size:0.7rem;">✓ Maintenance clauses accepted</span>';
+        data.maintenanceAgreementSigned = true;
+        data.maintenanceClausesAccepted = "Safe Work Practices, Public Liability, Designated Exit/Entrance, Report to Reception";
       }
-      sigPreview.innerHTML = `<div style="background:#f5efe0; border-radius:20px; padding:12px;"><strong><i class="fas fa-signature"></i> Visitor Signature:</strong><br><img src="${data.signatureBase64}" style="max-width:100%; max-height:100px; border:1px solid #d4af37; border-radius:12px; margin-top:8px;"><br><span style="font-size:0.7rem;">Signed on: ${data.signatureDate}</span>${extraText}</div>`;
-    } else {
-      sigPreview.innerHTML = `<div class="error-text">⚠️ Signature missing, please go back to step 3.</div>`;
+      return data;
     }
-  }
-  
-  function goNext() {
-    if(currentStep===1 && validateStep1()) { navigateTo(2); return; }
-    if(currentStep===2 && validateStep2()) { 
-      updateMaintenanceClauseVisibility();
-      navigateTo(3); 
-      return; 
+    
+    async function submitRegistration() {
+      const data = gatherFullData();
+      if(isSignatureEmpty()) { alert("Signature is required to complete registration."); return false; }
+      const loading = document.getElementById('loadingToast');
+      if(loading) loading.style.display = 'block';
+      try {
+        await db.collection(COLLECTION).add(data);
+        if(loading) loading.style.display = 'none';
+        alert(`✅ Registration Successful!\nVisitor ID: V-${Date.now().toString().slice(-6)}\nPlease proceed to the reception desk.`);
+        ['fullName','contact','company','personToVisit','vehicle','notes'].forEach(id => { let el = document.getElementById(id); if(el) el.value = ''; });
+        let purposeEl = document.getElementById('purpose'); if(purposeEl) purposeEl.value = '';
+        let agreeEl = document.getElementById('agreeClauses'); if(agreeEl) agreeEl.checked = false;
+        if(signaturePad) signaturePad.clear();
+        signatureHistory = [];
+        navigateTo(1);
+        return true;
+      } catch(e) { if(loading) loading.style.display = 'none'; alert("Error: "+e.message); return false; }
     }
-    if(currentStep===3 && validateStep3()) { navigateTo(4); renderReview(); return; }
-    if(currentStep===4) { submitRegistration(); }
-  }
-  
-  function goPrev() {
-    if(currentStep===2) navigateTo(1);
-    else if(currentStep===3) navigateTo(2);
-    else if(currentStep===4) navigateTo(3);
-  }
-  
-  // Export Functions with Signatures in PDF
-  async function fetchAllVisitors() { const snap = await db.collection(COLLECTION).orderBy('timestamp','desc').get(); return snap.docs.map(d=>d.data()); }
-  function filterByRange(data, range, start, end) { 
-    const now=new Date();
-    return data.filter(d=>{ 
-      let date=new Date(d.timestamp); 
-      if(range==='month') return date>=new Date(now.getFullYear(),now.getMonth(),1); 
-      if(range==='custom' && start && end) return date>=new Date(start) && date<=new Date(end); 
-      return true;
+    
+    function renderReview() {
+      const data = gatherFullData();
+      const reviewDiv = document.getElementById('reviewContainer');
+      if(reviewDiv) {
+        let maintHtml = (data.purpose === 'Maintenance') ? '<div class="review-row" style="background:#fff3df;"><strong>Maintenance Agreement:</strong> <span>Signed & Accepted ✓</span></div>' : '';
+        reviewDiv.innerHTML = `
+          <div class="review-row"><strong>Full Name:</strong> <span>${escapeHtml(data.fullName)}</span></div>
+          <div class="review-row"><strong>Contact:</strong> <span>${escapeHtml(data.contact)}</span></div>
+          <div class="review-row"><strong>Company:</strong> <span>${escapeHtml(data.company || "—")}</span></div>
+          <div class="review-row"><strong>Person to Visit:</strong> <span>${escapeHtml(data.personToVisit)}</span></div>
+          <div class="review-row"><strong>Purpose:</strong> <span>${escapeHtml(data.purpose)}</span></div>
+          <div class="review-row"><strong>Vehicle:</strong> <span>${escapeHtml(data.vehicle || "—")}</span></div>
+          <div class="review-row"><strong>Notes:</strong> <span>${escapeHtml(data.notes || "—")}</span></div>
+          ${maintHtml}
+        `;
+      }
+      const sigPreview = document.getElementById('signaturePreviewArea');
+      if(sigPreview && data.signatureBase64) {
+        let extraText = (data.purpose === 'Maintenance') ? '<br><span style="font-size:0.7rem;">✓ Maintenance clauses accepted</span>' : '';
+        sigPreview.innerHTML = `<div style="background:#f5efe0; border-radius:20px; padding:12px;"><strong><i class="fas fa-signature"></i> Visitor Signature:</strong><br><img src="${data.signatureBase64}" style="max-width:100%; max-height:100px; border:1px solid #d4af37; border-radius:12px; margin-top:8px;"><br><span style="font-size:0.7rem;">Signed on: ${data.signatureDate}</span>${extraText}</div>`;
+      }
+    }
+    
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m) { if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m; }); }
+    
+    function goNext() {
+      if(currentStep===1 && validateStep1()) { navigateTo(2); return; }
+      if(currentStep===2 && validateStep2()) { updateMaintenanceClauseVisibility(); navigateTo(3); return; }
+      if(currentStep===3 && validateStep3()) { navigateTo(4); renderReview(); return; }
+      if(currentStep===4) { submitRegistration(); }
+    }
+    function goPrev() {
+      if(currentStep===2) navigateTo(1);
+      else if(currentStep===3) navigateTo(2);
+      else if(currentStep===4) navigateTo(3);
+    }
+    
+    async function fetchAllVisitors() { const snap = await db.collection(COLLECTION).orderBy('timestamp','desc').get(); return snap.docs.map(d=>d.data()); }
+    function filterByRange(data, range, start, end) { 
+      const now=new Date();
+      return data.filter(d=>{ 
+        let date=new Date(d.timestamp); 
+        if(range==='month') return date>=new Date(now.getFullYear(),now.getMonth(),1); 
+        if(range==='custom' && start && end) return date>=new Date(start) && date<=new Date(end); 
+        return true;
+      });
+    }
+    function exportCSV(data) {
+      let headers = ["timestamp","fullName","contact","company","personToVisit","purpose","vehicle","notes","signatureDate","maintenanceAgreementSigned"];
+      let rows = data.map(r => headers.map(h => `"${(r[h]?.toString().replace(/"/g,'""') || "")}"`).join(","));
+      let csv = [headers.join(","), ...rows].join("\n");
+      let blob = new Blob([csv], {type:"text/csv"}); let a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="superb_visitors.csv"; a.click();
+    }
+    async function exportPDFWithSignatures(data) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "portrait", unit: "mm" });
+      let y = 20;
+      doc.setFontSize(18); doc.text("SUPERB HYPER - VISITOR REGISTRATION LOG", 105, y, { align: "center" }); y+=10;
+      doc.setFontSize(9); doc.text(`Generated: ${new Date().toLocaleString()}`, 105, y, { align: "center" }); y+=8;
+      for (let i=0; i<data.length; i++) {
+        if (y > 250) { doc.addPage(); y=20; }
+        const v = data[i];
+        doc.setFontSize(11); doc.text(`Visitor #${i+1}`, 15, y); y+=6;
+        doc.setFontSize(9);
+        doc.text(`Name: ${v.fullName || ""} | Contact: ${v.contact || ""}`, 15, y); y+=5;
+        doc.text(`Company: ${v.company || "-"} | Purpose: ${v.purpose || ""}`, 15, y); y+=5;
+        doc.text(`Person: ${v.personToVisit || ""} | Vehicle: ${v.vehicle || "-"}`, 15, y); y+=5;
+        doc.text(`Time: ${v.timestamp || ""}`, 15, y); y+=6;
+        if(v.signatureBase64) {
+          doc.text("✓ Visitor Signature:", 15, y); y+=4;
+          try { doc.addImage(v.signatureBase64, 'PNG', 15, y, 45, 18); y += 22; doc.text(`Signed: ${v.signatureDate || ""}`, 15, y); y+=5; } catch(e) { doc.text("Signature unavailable", 15, y); y+=6; }
+        } else { doc.text("No signature", 15, y); y+=5; }
+        if(v.purpose === "Maintenance" && v.maintenanceAgreementSigned) doc.text("✔ MAINTENANCE CLAUSES ACCEPTED", 15, y); y+=5;
+        doc.line(15, y, 195, y); y+=6;
+      }
+      doc.save("superb_visitor_log.pdf");
+    }
+    
+    let pendingExportType = null;
+    function showPasswordModal(cb) { 
+      const modal=document.getElementById('passwordModal'); 
+      if(modal) { modal.classList.add('active'); 
+      document.getElementById('confirmPassModal').onclick=()=>{ 
+        if(document.getElementById('adminPass').value===ADMIN_PASSWORD){ modal.classList.remove('active'); cb(); } 
+        else { document.getElementById('passError').innerText="Incorrect password"; } 
+      }; 
+      document.getElementById('cancelPassModal').onclick=()=>{ modal.classList.remove('active'); }; }
+    }
+    document.getElementById('exportCsvBtn')?.addEventListener('click',()=>{ pendingExportType='csv'; showPasswordModal(()=>{ let em=document.getElementById('exportModal'); if(em) em.classList.add('active'); }); });
+    document.getElementById('exportPdfBtn')?.addEventListener('click',()=>{ pendingExportType='pdf'; showPasswordModal(()=>{ let em=document.getElementById('exportModal'); if(em) em.classList.add('active'); }); });
+    document.getElementById('confirmExportAction')?.addEventListener('click', async()=>{ 
+      let range=document.querySelector('input[name="range"]:checked')?.value; 
+      let start=null,end=null; 
+      if(range==='custom'){ start=document.getElementById('startDateCustom')?.value; end=document.getElementById('endDateCustom')?.value; if(!start||!end){ alert("Select both dates"); return; } } 
+      const all=await fetchAllVisitors(); let filtered=filterByRange(all,range,start,end); 
+      if(!filtered.length){ alert("No records"); return; } 
+      if(pendingExportType==='csv') exportCSV(filtered); else await exportPDFWithSignatures(filtered); 
+      let em=document.getElementById('exportModal'); if(em) em.classList.remove('active'); 
     });
-  }
-  
-  function exportCSV(data) {
-    let headers = ["timestamp","fullName","contact","company","personToVisit","purpose","vehicle","notes","signatureDate","maintenanceAgreementSigned"];
-    let rows = data.map(r => headers.map(h => {
-      return `"${(r[h]?.toString().replace(/"/g,'""') || "")}"`;
-    }).join(","));
-    let csv = [headers.join(","), ...rows].join("\n");
-    let blob = new Blob([csv], {type:"text/csv"}); let a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="superb_visitors.csv"; a.click();
-  }
-  
-  async function exportPDFWithSignatures(data) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: "portrait", unit: "mm" });
-    let y = 20;
-    doc.setFontSize(18); doc.text("SUPERB HYPER - VISITOR REGISTRATION LOG", 105, y, { align: "center" }); y+=10;
-    doc.setFontSize(9); doc.text(`Generated: ${new Date().toLocaleString()}`, 105, y, { align: "center" }); y+=8;
-    for (let i=0; i<data.length; i++) {
-      if (y > 250) { doc.addPage(); y=20; }
-      const v = data[i];
-      doc.setFontSize(11); doc.text(`Visitor #${i+1}`, 15, y); y+=6;
-      doc.setFontSize(9);
-      doc.text(`Name: ${v.fullName || ""} | Contact: ${v.contact || ""}`, 15, y); y+=5;
-      doc.text(`Company: ${v.company || "-"} | Purpose: ${v.purpose || ""}`, 15, y); y+=5;
-      doc.text(`Person to visit: ${v.personToVisit || ""} | Vehicle: ${v.vehicle || "-"}`, 15, y); y+=5;
-      doc.text(`Time: ${v.timestamp || ""}`, 15, y); y+=6;
-      if(v.signatureBase64) {
-        doc.text("✓ Visitor Signature:", 15, y); y+=4;
-        try {
-          const imgData = v.signatureBase64;
-          const imgWidth = 45; const imgHeight = 18;
-          doc.addImage(imgData, 'PNG', 15, y, imgWidth, imgHeight);
-          y += imgHeight + 3;
-          doc.text(`Signed: ${v.signatureDate || ""}`, 15, y); y+=5;
-        } catch(e) { doc.text("Signature data unavailable", 15, y); y+=6; }
-      } else {
-        doc.text("No signature recorded", 15, y); y+=5;
-      }
-      if(v.purpose === "Maintenance" && v.maintenanceAgreementSigned) {
-        doc.text("✔ MAINTENANCE CLAUSES ACCEPTED (Provider Agreement)", 15, y); y+=5;
-      }
-      doc.line(15, y, 195, y); y+=6;
-      if (y > 260 && i !== data.length-1) { doc.addPage(); y=20; }
-    }
-    doc.save("superb_visitor_log.pdf");
-  }
-  
-  // Admin & Export Modal
-  let pendingExportType = null;
-  function showPasswordModal(cb) { 
-    const modal=document.getElementById('passwordModal'); 
-    modal.classList.add('active'); 
-    document.getElementById('confirmPassModal').onclick=()=>{ 
-      if(document.getElementById('adminPass').value===ADMIN_PASSWORD){ 
-        modal.classList.remove('active'); 
-        cb(); 
-      } else { 
-        document.getElementById('passError').innerText="Incorrect password"; 
-      } 
-    }; 
-    document.getElementById('cancelPassModal').onclick=()=>{ modal.classList.remove('active'); }; 
-  }
-  document.getElementById('exportCsvBtn').onclick=()=>{ pendingExportType='csv'; showPasswordModal(()=>{ document.getElementById('exportModal').classList.add('active'); }); };
-  document.getElementById('exportPdfBtn').onclick=()=>{ pendingExportType='pdf'; showPasswordModal(()=>{ document.getElementById('exportModal').classList.add('active'); }); };
-  document.getElementById('confirmExportAction').onclick=async()=>{ 
-    let range=document.querySelector('input[name="range"]:checked').value; 
-    let start=null,end=null; 
-    if(range==='custom'){ 
-      start=document.getElementById('startDateCustom').value; 
-      end=document.getElementById('endDateCustom').value; 
-      if(!start||!end){ alert("Please select both start and end dates"); return; } 
-    } 
-    const all=await fetchAllVisitors(); 
-    let filtered=filterByRange(all,range,start,end); 
-    if(!filtered.length){ alert("No visitor records match the selected criteria."); return; } 
-    if(pendingExportType==='csv') exportCSV(filtered); 
-    else await exportPDFWithSignatures(filtered); 
-    document.getElementById('exportModal').classList.remove('active'); 
-  };
-  document.getElementById('cancelExportModal').onclick=()=>{ document.getElementById('exportModal').classList.remove('active'); };
-  document.querySelectorAll('input[name="range"]').forEach(r=>{ r.addEventListener('change',()=>{ document.getElementById('customDateDiv').style.display = (r.value==='custom')?'block':'none'; }); });
-  document.getElementById('migrateBtn').onclick=()=>{ document.getElementById('migrationModal').classList.add('active'); };
-  document.getElementById('doMigration').onclick=async()=>{ 
-    const loadingDiv=document.getElementById('loadingToast'); 
-    loadingDiv.style.display='block'; 
-    try{ 
-      let res=await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{"X-Master-Key":API_KEY}}); 
-      let json=await res.json(); 
-      let records=Array.isArray(json.record)?json.record:[]; 
-      for(let rec of records){ 
-        await db.collection(COLLECTION).add({...rec, signatureBase64: null, maintenanceAgreementSigned: false}); 
-      } 
-      alert(`Successfully migrated ${records.length} records to Firebase.`); 
-    }catch(e){ alert("Migration failed: "+e.message); } 
-    finally{ loadingDiv.style.display='none'; document.getElementById('migrationModal').classList.remove('active'); } 
-  };
-  document.getElementById('cancelMigrationModal').onclick=()=>{ document.getElementById('migrationModal').classList.remove('active'); };
-  
-  // Event Listeners
-  document.getElementById('nextStep1').addEventListener('click', goNext);
-  document.getElementById('nextStep2').addEventListener('click', goNext);
-  document.getElementById('nextStep3').addEventListener('click', goNext);
-  document.getElementById('prevStep2').addEventListener('click', goPrev);
-  document.getElementById('prevStep3').addEventListener('click', goPrev);
-  document.getElementById('prevStep4').addEventListener('click', goPrev);
-  document.getElementById('submitFinal').addEventListener('click', goNext);
-  document.getElementById('purpose').addEventListener('change', updateMaintenanceClauseVisibility);
-  document.getElementById('agreementDate').valueAsDate = new Date();
-  
-  window.onload = () => { initSignaturePad(); updateStepUI(); updateMaintenanceClauseVisibility(); };
+    document.getElementById('cancelExportModal')?.addEventListener('click',()=>{ let em=document.getElementById('exportModal'); if(em) em.classList.remove('active'); });
+    document.querySelectorAll('input[name="range"]').forEach(r=>{ r.addEventListener('change',()=>{ let cd=document.getElementById('customDateDiv'); if(cd) cd.style.display = (r.value==='custom')?'block':'none'; }); });
+    document.getElementById('migrateBtn')?.addEventListener('click',()=>{ let mm=document.getElementById('migrationModal'); if(mm) mm.classList.add('active'); });
+    document.getElementById('doMigration')?.addEventListener('click', async()=>{ 
+      const ld=document.getElementById('loadingToast'); if(ld) ld.style.display='block'; 
+      try{ let res=await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{"X-Master-Key":API_KEY}}); let json=await res.json(); let records=Array.isArray(json.record)?json.record:[]; for(let rec of records){ await db.collection(COLLECTION).add({...rec, signatureBase64: null}); } alert(`Migrated ${records.length} records.`); }catch(e){ alert("Migration error"); } finally{ if(ld) ld.style.display='none'; let mm=document.getElementById('migrationModal'); if(mm) mm.classList.remove('active'); } 
+    });
+    document.getElementById('cancelMigrationModal')?.addEventListener('click',()=>{ let mm=document.getElementById('migrationModal'); if(mm) mm.classList.remove('active'); });
+    
+    document.getElementById('nextStep1')?.addEventListener('click', goNext);
+    document.getElementById('nextStep2')?.addEventListener('click', goNext);
+    document.getElementById('nextStep3')?.addEventListener('click', goNext);
+    document.getElementById('prevStep2')?.addEventListener('click', goPrev);
+    document.getElementById('prevStep3')?.addEventListener('click', goPrev);
+    document.getElementById('prevStep4')?.addEventListener('click', goPrev);
+    document.getElementById('submitFinal')?.addEventListener('click', goNext);
+    document.getElementById('purpose')?.addEventListener('change', updateMaintenanceClauseVisibility);
+    let dateInput = document.getElementById('agreementDate'); if(dateInput) dateInput.valueAsDate = new Date();
+    
+    initSignaturePad();
+    updateStepUI();
+    updateMaintenanceClauseVisibility();
+  })();
 </script>
 </body>
 </html>
