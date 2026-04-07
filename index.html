@@ -69,8 +69,9 @@
     .review-card { background: #fef9e6; border-radius: 24px; padding: 1rem; margin-bottom: 1rem; }
     .review-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #e2c28b; padding: 8px 0; }
     .signature-thumb { background: #f0ebe0; border-radius: 16px; padding: 10px; text-align: center; margin-top: 12px; }
-    .footer-actions { display: flex; gap: 12px; justify-content: center; margin-top: 1.5rem; }
-    .action-icon { background: rgba(255,255,240,0.2); backdrop-filter: blur(8px); padding: 10px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; border: 1px solid rgba(212,175,55,0.5); transition: 0.2s; }
+    .footer-actions { display: flex; gap: 12px; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
+    .action-icon { background: rgba(255,255,240,0.2); backdrop-filter: blur(8px); padding: 10px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; border: 1px solid rgba(212,175,55,0.5); transition: 0.2s; font-size: 0.85rem; }
+    .action-icon:hover { background: rgba(212,175,55,0.3); transform: translateY(-2px); }
     .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; visibility: hidden; opacity: 0; transition: 0.2s; }
     .modal-overlay.active { visibility: visible; opacity: 1; }
     .modal-content { background: white; border-radius: 32px; max-width: 460px; width: 90%; padding: 2rem; }
@@ -155,8 +156,9 @@
     </div>
   </div>
   <div class="footer-actions">
-    <div class="action-icon" id="exportCsvBtn"><i class="fas fa-file-csv"></i> CSV</div>
-    <div class="action-icon" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> PDF (with Signatures)</div>
+    <div class="action-icon" id="exportCsvBtn"><i class="fas fa-file-csv"></i> CSV Export</div>
+    <div class="action-icon" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> PDF with Signatures</div>
+    <div class="action-icon" id="exportPdfSummaryBtn"><i class="fas fa-table"></i> PDF Summary Table</div>
     <div class="action-icon" id="migrateBtn"><i class="fas fa-database"></i> Migrate Data</div>
   </div>
 </div>
@@ -344,6 +346,8 @@
       let csv = [headers.join(","), ...rows].join("\n");
       let blob = new Blob([csv], {type:"text/csv"}); let a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="superb_visitors.csv"; a.click();
     }
+    
+    // PDF WITH SIGNATURES (original detailed version)
     async function exportPDFWithSignatures(data) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "portrait", unit: "mm" });
@@ -366,7 +370,43 @@
         if(v.purpose === "Maintenance" && v.maintenanceAgreementSigned) doc.text("✔ MAINTENANCE CLAUSES ACCEPTED", 15, y); y+=5;
         doc.line(15, y, 195, y); y+=6;
       }
-      doc.save("superb_visitor_log.pdf");
+      doc.save("superb_visitor_log_with_signatures.pdf");
+    }
+    
+    // NEW: PDF SUMMARY TABLE (NO SIGNATURES, CLEAN TABLE FORMAT)
+    async function exportPDFSummaryTable(data) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "landscape", unit: "mm" });
+      doc.setFontSize(16);
+      doc.text("SUPERB HYPER - VISITOR SUMMARY REPORT", 14, 15);
+      doc.setFontSize(9);
+      doc.text(`Generated: ${new Date().toLocaleString()} | Total Visitors: ${data.length}`, 14, 23);
+      
+      const tableColumnHeaders = ["Date/Time", "Full Name", "Contact", "Company", "Person to Visit", "Purpose", "Vehicle", "Notes", "Signed Date"];
+      const tableRows = data.map(v => [
+        v.timestamp || "",
+        v.fullName || "",
+        v.contact || "",
+        v.company || "-",
+        v.personToVisit || "",
+        v.purpose || "",
+        v.vehicle || "-",
+        (v.notes || "-").substring(0, 40),
+        v.signatureDate || ""
+      ]);
+      
+      doc.autoTable({
+        head: [tableColumnHeaders],
+        body: tableRows,
+        startY: 30,
+        theme: 'striped',
+        headStyles: { fillColor: [212, 175, 55], textColor: [30, 42, 54], fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [248, 245, 235] },
+        margin: { left: 10, right: 10 },
+        styles: { fontSize: 8, cellPadding: 2 },
+        columnStyles: { 0: { cellWidth: 35 }, 1: { cellWidth: 30 }, 2: { cellWidth: 25 }, 3: { cellWidth: 30 }, 4: { cellWidth: 30 }, 5: { cellWidth: 25 }, 6: { cellWidth: 20 }, 7: { cellWidth: 35 }, 8: { cellWidth: 20 } }
+      });
+      doc.save("superb_visitor_summary_table.pdf");
     }
     
     let pendingExportType = null;
@@ -379,15 +419,20 @@
       }; 
       document.getElementById('cancelPassModal').onclick=()=>{ modal.classList.remove('active'); }; }
     }
+    
     document.getElementById('exportCsvBtn')?.addEventListener('click',()=>{ pendingExportType='csv'; showPasswordModal(()=>{ let em=document.getElementById('exportModal'); if(em) em.classList.add('active'); }); });
-    document.getElementById('exportPdfBtn')?.addEventListener('click',()=>{ pendingExportType='pdf'; showPasswordModal(()=>{ let em=document.getElementById('exportModal'); if(em) em.classList.add('active'); }); });
+    document.getElementById('exportPdfBtn')?.addEventListener('click',()=>{ pendingExportType='pdfSignatures'; showPasswordModal(()=>{ let em=document.getElementById('exportModal'); if(em) em.classList.add('active'); }); });
+    document.getElementById('exportPdfSummaryBtn')?.addEventListener('click',()=>{ pendingExportType='pdfSummary'; showPasswordModal(()=>{ let em=document.getElementById('exportModal'); if(em) em.classList.add('active'); }); });
+    
     document.getElementById('confirmExportAction')?.addEventListener('click', async()=>{ 
       let range=document.querySelector('input[name="range"]:checked')?.value; 
       let start=null,end=null; 
       if(range==='custom'){ start=document.getElementById('startDateCustom')?.value; end=document.getElementById('endDateCustom')?.value; if(!start||!end){ alert("Select both dates"); return; } } 
       const all=await fetchAllVisitors(); let filtered=filterByRange(all,range,start,end); 
-      if(!filtered.length){ alert("No records"); return; } 
-      if(pendingExportType==='csv') exportCSV(filtered); else await exportPDFWithSignatures(filtered); 
+      if(!filtered.length){ alert("No records to export"); return; } 
+      if(pendingExportType==='csv') exportCSV(filtered);
+      else if(pendingExportType==='pdfSignatures') await exportPDFWithSignatures(filtered);
+      else if(pendingExportType==='pdfSummary') await exportPDFSummaryTable(filtered);
       let em=document.getElementById('exportModal'); if(em) em.classList.remove('active'); 
     });
     document.getElementById('cancelExportModal')?.addEventListener('click',()=>{ let em=document.getElementById('exportModal'); if(em) em.classList.remove('active'); });
@@ -395,7 +440,7 @@
     document.getElementById('migrateBtn')?.addEventListener('click',()=>{ let mm=document.getElementById('migrationModal'); if(mm) mm.classList.add('active'); });
     document.getElementById('doMigration')?.addEventListener('click', async()=>{ 
       const ld=document.getElementById('loadingToast'); if(ld) ld.style.display='block'; 
-      try{ let res=await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{"X-Master-Key":API_KEY}}); let json=await res.json(); let records=Array.isArray(json.record)?json.record:[]; for(let rec of records){ await db.collection(COLLECTION).add({...rec, signatureBase64: null}); } alert(`Migrated ${records.length} records.`); }catch(e){ alert("Migration error"); } finally{ if(ld) ld.style.display='none'; let mm=document.getElementById('migrationModal'); if(mm) mm.classList.remove('active'); } 
+      try{ let res=await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{"X-Master-Key":API_KEY}}); let json=await res.json(); let records=Array.isArray(json.record)?json.record:[]; let count=0; for(let rec of records){ await db.collection(COLLECTION).add({...rec, signatureBase64: null}); count++; } alert(`Migrated ${count} records.`); }catch(e){ alert("Migration error: "+e.message); } finally{ if(ld) ld.style.display='none'; let mm=document.getElementById('migrationModal'); if(mm) mm.classList.remove('active'); } 
     });
     document.getElementById('cancelMigrationModal')?.addEventListener('click',()=>{ let mm=document.getElementById('migrationModal'); if(mm) mm.classList.remove('active'); });
     
