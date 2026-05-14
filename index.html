@@ -24,7 +24,7 @@
       padding: 2rem 1rem;
       min-height: 100vh;
     }
-    .container { max-width: 620px; margin: 0 auto; }
+    .container { max-width: 680px; margin: 0 auto; }
     .glass-card {
       background: rgba(255, 255, 255, 0.97);
       backdrop-filter: blur(12px);
@@ -74,8 +74,129 @@
     .action-icon:hover { background: rgba(212,175,55,0.3); transform: translateY(-2px); }
     .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; visibility: hidden; opacity: 0; transition: 0.2s; }
     .modal-overlay.active { visibility: visible; opacity: 1; }
-    .modal-content { background: white; border-radius: 32px; max-width: 460px; width: 90%; padding: 2rem; }
+    .modal-content { background: white; border-radius: 32px; max-width: 460px; width: 90%; padding: 2rem; max-height: 80vh; overflow-y: auto; }
     .error-text { color: #c2410c; font-size: 0.7rem; margin-top: 5px; }
+    
+    /* Badge Management Styles */
+    .badge-management {
+      background: #f0f9ff;
+      border-radius: 24px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+      border: 2px solid #bae6fd;
+    }
+    .badge-pool-info {
+      background: white;
+      border-radius: 16px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid #e2e8f0;
+    }
+    .badge-pool-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 0.5rem;
+    }
+    .badge-stat {
+      text-align: center;
+      padding: 0.5rem;
+    }
+    .badge-stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: block;
+    }
+    .badge-stat-label {
+      font-size: 0.7rem;
+      color: #64748b;
+      display: block;
+      margin-top: 0.2rem;
+    }
+    .badge-selection-area {
+      margin-top: 1rem;
+    }
+    .badge-numbers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      gap: 0.5rem;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 0.5rem;
+      background: white;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+    }
+    .badge-number-item {
+      text-align: center;
+      padding: 8px;
+      border-radius: 8px;
+      border: 2px solid #e2e8f0;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: 0.2s;
+      user-select: none;
+    }
+    .badge-number-item.available {
+      background: #f0fdf4;
+      border-color: #22c55e;
+      color: #166534;
+    }
+    .badge-number-item.available:hover {
+      background: #22c55e;
+      color: white;
+      transform: scale(1.05);
+    }
+    .badge-number-item.selected {
+      background: #d4af37;
+      border-color: #b88b1a;
+      color: #1e2a3a;
+      transform: scale(1.05);
+    }
+    .badge-number-item.issued {
+      background: #fef3c7;
+      border-color: #d4af37;
+      color: #92400e;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    .badge-number-item.returned {
+      background: #e2e8f0;
+      border-color: #94a3b8;
+      color: #475569;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    .selected-badges-display {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: white;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+    }
+    .selected-badge-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #d4af37;
+      color: #1e2a3a;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      margin: 0.2rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .selected-badge-tag .remove-badge {
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 4px;
+    }
+    .badge-counter-input {
+      width: 80px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1rem;
+    }
     @keyframes fadeSlide { from { opacity:0; transform: translateY(10px);} to { opacity:1; transform: translateY(0);} }
     .form-step { animation: fadeSlide 0.3s ease; }
     @media (max-width: 550px) { .form-panel { padding: 1.5rem; } .btn-group { flex-direction: column; } }
@@ -86,12 +207,12 @@
   <div class="logo-area">
     <div class="logo-text">SUPERB HYPER</div>
     <div class="badge"><i class="fas fa-door-open"></i> VISITOR REGISTRATION PORTAL</div>
-    <p style="color:#9aaec0; font-size:0.75rem;">Premium service | Secure check-in | Signature required</p>
+    <p style="color:#9aaec0; font-size:0.75rem;">Premium service | Secure check-in | Badge management</p>
   </div>
   <div class="steps" id="stepIndicator">
     <div class="step" data-step="1"><div class="circle">1</div><span>Personal Info</span></div>
     <div class="step" data-step="2"><div class="circle">2</div><span>Visit Details</span></div>
-    <div class="step" data-step="3"><div class="circle">3</div><span>Signature</span></div>
+    <div class="step" data-step="3"><div class="circle">3</div><span>Badges & Signature</span></div>
     <div class="step" data-step="4"><div class="circle">4</div><span>Confirmation</span></div>
   </div>
   <div class="glass-card">
@@ -121,8 +242,48 @@
       <div class="btn-group"><button class="btn-secondary" id="prevStep2"><i class="fas fa-arrow-left"></i> Back</button><button class="btn-primary" id="nextStep2">Next →</button></div>
     </div>
     <div id="step3" class="form-panel form-step" style="display:none;">
-      <h3><i class="fas fa-signature"></i> Digital Signature</h3>
-      <p style="font-size:0.8rem; color:#4a5568; margin-bottom:1rem;">Please sign below to confirm your visit registration.</p>
+      <h3><i class="fas fa-id-badge"></i> Contractor Badges & Signature</h3>
+      <p style="font-size:0.8rem; color:#4a5568; margin-bottom:1rem;">Select badges from the available pool (Badges 1-100)</p>
+      
+      <!-- Contractor Badge Selection (Visible only for Maintenance) -->
+      <div id="contractorBadgePanel" style="display:none;">
+        <div class="badge-management">
+          <div class="badge-pool-info">
+            <h4><i class="fas fa-chart-pie"></i> Badge Pool Status</h4>
+            <div class="badge-pool-stats">
+              <div class="badge-stat">
+                <span class="badge-stat-number" id="availableBadgesCount" style="color: #22c55e;">100</span>
+                <span class="badge-stat-label">Available</span>
+              </div>
+              <div class="badge-stat">
+                <span class="badge-stat-number" id="issuedBadgesCount" style="color: #d4af37;">0</span>
+                <span class="badge-stat-label">Issued</span>
+              </div>
+              <div class="badge-stat">
+                <span class="badge-stat-number" id="returnedBadgesCount" style="color: #94a3b8;">0</span>
+                <span class="badge-stat-label">Returned</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="badge-selection-area">
+            <label><i class="fas fa-tags"></i> Select Badge Numbers (Click to select/deselect)</label>
+            <div class="badge-numbers-grid" id="badgeNumbersGrid">
+              <!-- Badge numbers will be rendered here -->
+            </div>
+            <div class="error-text" id="badgeErrorMsg"></div>
+          </div>
+          
+          <div class="selected-badges-display" id="selectedBadgesDisplay" style="display:none;">
+            <label><i class="fas fa-check-circle"></i> Selected Badges:</label>
+            <div id="selectedBadgesContainer"></div>
+            <button type="button" class="small-btn" id="clearSelectionBtn" style="margin-top: 0.5rem;">
+              <i class="fas fa-times"></i> Clear Selection
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div id="maintenanceClausePanel" style="display:none;">
         <div class="legal-clause">
           <p><i class="fas fa-hard-hat"></i> <strong>Maintenance Service Provider Agreement</strong></p>
@@ -130,6 +291,7 @@
           <p>2. <strong>Public Liability</strong> – Superb Hyper not liable for incidents with Team Members or public during works.</p>
           <p>3. <strong>Designated Exit & Entrance</strong> – Use designated points; security searches may be conducted.</p>
           <p>4. <strong>Report to Reception</strong> – Report to reception upon arrival and departure. Register must be completed.</p>
+          <p>5. <strong>Contractor Badges</strong> – All contractors must wear issued badges visibly. Badges must be returned upon completion of work.</p>
         </div>
         <div class="checkbox-row"><input type="checkbox" id="agreeClauses"> <label for="agreeClauses" style="font-weight:700;">I have read, understood and agree to abide by all Maintenance Service Provider rules.</label></div>
         <div class="error-text" id="clauseErrorMsg"></div>
@@ -159,6 +321,8 @@
     <div class="action-icon" id="exportCsvBtn"><i class="fas fa-file-csv"></i> CSV Export</div>
     <div class="action-icon" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> PDF with Signatures</div>
     <div class="action-icon" id="exportPdfSummaryBtn"><i class="fas fa-table"></i> PDF Summary Table</div>
+    <div class="action-icon" id="badgeReturnBtn"><i class="fas fa-undo"></i> Return Badge</div>
+    <div class="action-icon" id="badgeStatusBtn"><i class="fas fa-chart-bar"></i> Badge Status</div>
     <div class="action-icon" id="migrateBtn"><i class="fas fa-database"></i> Migrate Data</div>
   </div>
 </div>
@@ -166,6 +330,8 @@
 <div id="passwordModal" class="modal-overlay"><div class="modal-content"><h3><i class="fas fa-lock"></i> Admin Authentication</h3><input type="password" id="adminPass" placeholder="Admin password"><div id="passError" style="color:red;font-size:0.8rem;"></div><div class="btn-group"><button id="cancelPassModal" class="btn-secondary">Cancel</button><button id="confirmPassModal" class="btn-primary">Confirm</button></div></div></div>
 <div id="exportModal" class="modal-overlay"><div class="modal-content"><h3>Export Visitor Records</h3><div><label><input type="radio" name="range" value="all" checked> All Data</label></div><div><label><input type="radio" name="range" value="month"> Month to Date</label></div><div><label><input type="radio" name="range" value="custom"> Custom Range</label><div id="customDateDiv" style="display:none; margin-top:8px;"><input type="date" id="startDateCustom"><input type="date" id="endDateCustom" style="margin-top:8px;"></div></div><div class="btn-group"><button id="cancelExportModal" class="btn-secondary">Cancel</button><button id="confirmExportAction" class="btn-primary">Export</button></div></div></div>
 <div id="migrationModal" class="modal-overlay"><div class="modal-content"><h3>Data Migration</h3><p>Migrate existing visitor data from JSONBin to Firebase.</p><button id="doMigration" class="btn-primary">Start Migration</button><button id="cancelMigrationModal" class="btn-secondary" style="margin-left:8px;">Close</button><div id="migrateStatus"></div></div></div>
+<div id="badgeReturnModal" class="modal-overlay"><div class="modal-content"><h3><i class="fas fa-undo"></i> Return Contractor Badge</h3><div class="form-group"><label>Badge Number (1-100)</label><input type="number" id="returnBadgeNumber" min="1" max="100" placeholder="Enter badge number to return"></div><div class="form-group"><label>Visitor Name (optional)</label><input type="text" id="returnVisitorName" placeholder="Enter visitor name for verification"></div><div id="badgeReturnError" style="color:red;font-size:0.8rem;"></div><div class="btn-group"><button id="cancelBadgeReturn" class="btn-secondary">Cancel</button><button id="confirmBadgeReturn" class="btn-primary">Return Badge</button></div></div></div>
+<div id="badgeStatusModal" class="modal-overlay"><div class="modal-content" style="max-width: 600px;"><h3><i class="fas fa-chart-bar"></i> Badge Pool Status</h3><div id="badgeStatusContent"></div><div class="btn-group"><button id="closeBadgeStatus" class="btn-primary">Close</button></div></div></div>
 <div id="loadingToast" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1a2c3e; color:white; padding:8px 20px; border-radius:40px; z-index:2000; display:none;">Processing...</div>
 
 <script>
@@ -174,14 +340,153 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const COLLECTION = "visitors";
+    const BADGES_COLLECTION = "contractor_badges";
     const API_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
     const BIN_ID = '68669b0e8a456b7966babb15';
     const ADMIN_PASSWORD = 'Superb@123';
+    const TOTAL_BADGES = 100; // Your 100 badges pool
 
     let signaturePad = null;
     let signatureHistory = [];
     let currentStep = 1;
+    let selectedBadges = new Set(); // Store selected badge numbers
+    let badgePoolStatus = {}; // Track status of all 100 badges
     const stepPanels = {1: document.getElementById('step1'), 2: document.getElementById('step2'), 3: document.getElementById('step3'), 4: document.getElementById('step4')};
+
+    // Initialize badge pool (badges 1-100)
+    async function initializeBadgePool() {
+      // Initialize all badges as available
+      for (let i = 1; i <= TOTAL_BADGES; i++) {
+        badgePoolStatus[i] = 'available';
+      }
+      
+      // Fetch currently issued badges from Firestore
+      try {
+        const issuedBadges = await db.collection(BADGES_COLLECTION)
+          .where('status', '==', 'active')
+          .get();
+        
+        issuedBadges.forEach(doc => {
+          const badgeData = doc.data();
+          const badgeNumber = parseInt(badgeData.number);
+          if (badgeNumber >= 1 && badgeNumber <= TOTAL_BADGES) {
+            badgePoolStatus[badgeNumber] = 'issued';
+          }
+        });
+        
+        // Also get returned badges to mark them differently
+        const returnedBadges = await db.collection(BADGES_COLLECTION)
+          .where('status', '==', 'returned')
+          .get();
+        
+        returnedBadges.forEach(doc => {
+          const badgeData = doc.data();
+          const badgeNumber = parseInt(badgeData.number);
+          if (badgeNumber >= 1 && badgeNumber <= TOTAL_BADGES) {
+            badgePoolStatus[badgeNumber] = 'returned';
+          }
+        });
+      } catch (error) {
+        console.log("Could not fetch badge status:", error);
+      }
+      
+      updateBadgeStats();
+      renderBadgeGrid();
+    }
+
+    function updateBadgeStats() {
+      let available = 0, issued = 0, returned = 0;
+      for (let i = 1; i <= TOTAL_BADGES; i++) {
+        if (badgePoolStatus[i] === 'available') available++;
+        else if (badgePoolStatus[i] === 'issued') issued++;
+        else if (badgePoolStatus[i] === 'returned') returned++;
+      }
+      
+      document.getElementById('availableBadgesCount').textContent = available;
+      document.getElementById('issuedBadgesCount').textContent = issued;
+      document.getElementById('returnedBadgesCount').textContent = returned;
+    }
+
+    function renderBadgeGrid() {
+      const grid = document.getElementById('badgeNumbersGrid');
+      if (!grid) return;
+      
+      grid.innerHTML = '';
+      for (let i = 1; i <= TOTAL_BADGES; i++) {
+        const badgeDiv = document.createElement('div');
+        badgeDiv.className = `badge-number-item ${badgePoolStatus[i]}`;
+        badgeDiv.textContent = i;
+        badgeDiv.dataset.badgeNumber = i;
+        
+        if (badgePoolStatus[i] === 'available') {
+          // Check if this badge is currently selected
+          if (selectedBadges.has(i)) {
+            badgeDiv.classList.add('selected');
+          }
+          badgeDiv.onclick = () => toggleBadgeSelection(i);
+        } else if (badgePoolStatus[i] === 'issued') {
+          badgeDiv.title = 'Currently issued';
+        } else if (badgePoolStatus[i] === 'returned') {
+          badgeDiv.title = 'Returned - available for reissue';
+          // Allow selecting returned badges
+          badgeDiv.onclick = () => toggleBadgeSelection(i);
+          badgeDiv.style.cursor = 'pointer';
+          badgeDiv.style.opacity = '0.7';
+        }
+        
+        grid.appendChild(badgeDiv);
+      }
+    }
+
+    function toggleBadgeSelection(badgeNumber) {
+      if (badgePoolStatus[badgeNumber] === 'issued') {
+        return; // Can't select issued badges
+      }
+      
+      if (selectedBadges.has(badgeNumber)) {
+        selectedBadges.delete(badgeNumber);
+      } else {
+        selectedBadges.add(badgeNumber);
+      }
+      
+      updateSelectedBadgesDisplay();
+      renderBadgeGrid();
+    }
+
+    function updateSelectedBadgesDisplay() {
+      const display = document.getElementById('selectedBadgesDisplay');
+      const container = document.getElementById('selectedBadgesContainer');
+      
+      if (!display || !container) return;
+      
+      if (selectedBadges.size === 0) {
+        display.style.display = 'none';
+        return;
+      }
+      
+      display.style.display = 'block';
+      container.innerHTML = Array.from(selectedBadges)
+        .sort((a, b) => a - b)
+        .map(badgeNum => `
+          <span class="selected-badge-tag">
+            Badge #${badgeNum}
+            <span class="remove-badge" onclick="removeBadgeSelection(${badgeNum})">×</span>
+          </span>
+        `).join('');
+    }
+
+    function clearBadgeSelection() {
+      selectedBadges.clear();
+      updateSelectedBadgesDisplay();
+      renderBadgeGrid();
+    }
+
+    // Make functions globally accessible for onclick handlers
+    window.removeBadgeSelection = function(badgeNumber) {
+      selectedBadges.delete(badgeNumber);
+      updateSelectedBadgesDisplay();
+      renderBadgeGrid();
+    };
 
     function initSignaturePad() {
       const canvas = document.getElementById('signatureCanvas');
@@ -211,7 +516,14 @@
     function updateMaintenanceClauseVisibility() {
       const purpose = document.getElementById('purpose').value;
       const clausePanel = document.getElementById('maintenanceClausePanel');
+      const badgePanel = document.getElementById('contractorBadgePanel');
       if(clausePanel) clausePanel.style.display = (purpose === 'Maintenance') ? 'block' : 'none';
+      if(badgePanel) {
+        badgePanel.style.display = (purpose === 'Maintenance') ? 'block' : 'none';
+        if (purpose === 'Maintenance') {
+          initializeBadgePool(); // Refresh badge pool when maintenance is selected
+        }
+      }
     }
     
     function validateStep1() { 
@@ -242,6 +554,11 @@
           if(clauseErr) clauseErr.innerText = "You must accept the Maintenance Service Provider agreement."; 
           return false; 
         }
+        if (selectedBadges.size === 0) {
+          let badgeErr = document.getElementById('badgeErrorMsg');
+          if(badgeErr) badgeErr.innerText = "Please select at least one badge from the pool."; 
+          return false;
+        }
       }
       return true;
     }
@@ -265,11 +582,21 @@
         signatureBase64: getSignatureAsBase64(),
         signatureDate: document.getElementById('agreementDate')?.value || new Date().toISOString().slice(0,10),
         maintenanceAgreementSigned: false,
-        maintenanceClausesAccepted: ""
+        maintenanceClausesAccepted: "",
+        contractorBadges: [],
+        contractorCount: 0
       };
       if(data.purpose === 'Maintenance') {
         data.maintenanceAgreementSigned = true;
-        data.maintenanceClausesAccepted = "Safe Work Practices, Public Liability, Designated Exit/Entrance, Report to Reception";
+        data.maintenanceClausesAccepted = "Safe Work Practices, Public Liability, Designated Exit/Entrance, Report to Reception, Contractor Badge Requirement";
+        // Convert selected badges to array of badge objects
+        data.contractorBadges = Array.from(selectedBadges).map(badgeNum => ({
+          number: badgeNum.toString(),
+          status: 'active',
+          issuedAt: new Date().toISOString(),
+          returnedAt: null
+        }));
+        data.contractorCount = selectedBadges.size;
       }
       return data;
     }
@@ -277,17 +604,58 @@
     async function submitRegistration() {
       const data = gatherFullData();
       if(isSignatureEmpty()) { alert("Signature is required to complete registration."); return false; }
+      
+      if (data.purpose === 'Maintenance' && data.contractorBadges.length === 0) {
+        alert("Please select at least one badge from the pool.");
+        return false;
+      }
+      
       const loading = document.getElementById('loadingToast');
       if(loading) loading.style.display = 'block';
       try {
-        await db.collection(COLLECTION).add(data);
+        // Save visitor record
+        const docRef = await db.collection(COLLECTION).add(data);
+        
+        // Save badge records separately for easier tracking
+        if (data.contractorBadges && data.contractorBadges.length > 0) {
+          const batch = db.batch();
+          data.contractorBadges.forEach(badge => {
+            const badgeRef = db.collection(BADGES_COLLECTION).doc(); // Auto-generated ID
+            batch.set(badgeRef, {
+              ...badge,
+              visitorId: docRef.id,
+              visitorName: data.fullName,
+              company: data.company,
+              purpose: data.purpose,
+              timestamp: data.timestamp
+            });
+          });
+          await batch.commit();
+        }
+        
         if(loading) loading.style.display = 'none';
-        alert(`✅ Registration Successful!\nVisitor ID: V-${Date.now().toString().slice(-6)}\nPlease proceed to the reception desk.`);
+        
+        let message = `✅ Registration Successful!\nVisitor ID: V-${Date.now().toString().slice(-6)}`;
+        if (data.contractorBadges && data.contractorBadges.length > 0) {
+          message += `\n📛 ${data.contractorBadges.length} Badge(s) Issued:`;
+          data.contractorBadges.forEach(badge => {
+            message += `\n   - Badge #${badge.number}`;
+          });
+          message += `\n⚠️ Remember to return all badges at reception when leaving!`;
+        }
+        message += `\nPlease proceed to the reception desk.`;
+        
+        alert(message);
+        
+        // Reset form
         ['fullName','contact','company','personToVisit','vehicle','notes'].forEach(id => { let el = document.getElementById(id); if(el) el.value = ''; });
         let purposeEl = document.getElementById('purpose'); if(purposeEl) purposeEl.value = '';
         let agreeEl = document.getElementById('agreeClauses'); if(agreeEl) agreeEl.checked = false;
         if(signaturePad) signaturePad.clear();
         signatureHistory = [];
+        selectedBadges.clear();
+        updateSelectedBadgesDisplay();
+        initializeBadgePool(); // Refresh badge pool
         navigateTo(1);
         return true;
       } catch(e) { if(loading) loading.style.display = 'none'; alert("Error: "+e.message); return false; }
@@ -297,7 +665,24 @@
       const data = gatherFullData();
       const reviewDiv = document.getElementById('reviewContainer');
       if(reviewDiv) {
-        let maintHtml = (data.purpose === 'Maintenance') ? '<div class="review-row" style="background:#fff3df;"><strong>Maintenance Agreement:</strong> <span>Signed & Accepted ✓</span></div>' : '';
+        let maintHtml = '';
+        if (data.purpose === 'Maintenance') {
+          maintHtml = `
+            <div class="review-row" style="background:#fff3df;">
+              <strong>Maintenance Agreement:</strong> <span>Signed & Accepted ✓</span>
+            </div>
+            <div class="review-row" style="background:#fff3df;">
+              <strong>Badges Issued:</strong> <span>${data.contractorBadges.length} from pool of 100</span>
+            </div>
+            ${data.contractorBadges.map(badge => `
+              <div class="review-row" style="background:#f8fafc; font-size:0.8rem;">
+                <span>📛 Badge #${badge.number}</span>
+                <span style="color: #d4af37;">Active</span>
+              </div>
+            `).join('')}
+          `;
+        }
+        
         reviewDiv.innerHTML = `
           <div class="review-row"><strong>Full Name:</strong> <span>${escapeHtml(data.fullName)}</span></div>
           <div class="review-row"><strong>Contact:</strong> <span>${escapeHtml(data.contact)}</span></div>
@@ -311,7 +696,7 @@
       }
       const sigPreview = document.getElementById('signaturePreviewArea');
       if(sigPreview && data.signatureBase64) {
-        let extraText = (data.purpose === 'Maintenance') ? '<br><span style="font-size:0.7rem;">✓ Maintenance clauses accepted</span>' : '';
+        let extraText = (data.purpose === 'Maintenance') ? '<br><span style="font-size:0.7rem;">✓ Maintenance clauses accepted | Badges issued from pool</span>' : '';
         sigPreview.innerHTML = `<div style="background:#f5efe0; border-radius:20px; padding:12px;"><strong><i class="fas fa-signature"></i> Visitor Signature:</strong><br><img src="${data.signatureBase64}" style="max-width:100%; max-height:100px; border:1px solid #d4af37; border-radius:12px; margin-top:8px;"><br><span style="font-size:0.7rem;">Signed on: ${data.signatureDate}</span>${extraText}</div>`;
       }
     }
@@ -341,13 +726,12 @@
       });
     }
     function exportCSV(data) {
-      let headers = ["timestamp","fullName","contact","company","personToVisit","purpose","vehicle","notes","signatureDate","maintenanceAgreementSigned"];
+      let headers = ["timestamp","fullName","contact","company","personToVisit","purpose","vehicle","notes","signatureDate","maintenanceAgreementSigned","contractorCount"];
       let rows = data.map(r => headers.map(h => `"${(r[h]?.toString().replace(/"/g,'""') || "")}"`).join(","));
       let csv = [headers.join(","), ...rows].join("\n");
       let blob = new Blob([csv], {type:"text/csv"}); let a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="superb_visitors.csv"; a.click();
     }
     
-    // PDF WITH SIGNATURES (original detailed version)
     async function exportPDFWithSignatures(data) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "portrait", unit: "mm" });
@@ -363,6 +747,12 @@
         doc.text(`Company: ${v.company || "-"} | Purpose: ${v.purpose || ""}`, 15, y); y+=5;
         doc.text(`Person: ${v.personToVisit || ""} | Vehicle: ${v.vehicle || "-"}`, 15, y); y+=5;
         doc.text(`Time: ${v.timestamp || ""}`, 15, y); y+=6;
+        if(v.contractorBadges && v.contractorBadges.length > 0) {
+          doc.text(`📛 Contractor Badges (from pool of 100): ${v.contractorBadges.length} issued`, 15, y); y+=5;
+          v.contractorBadges.forEach(badge => {
+            doc.text(`   - Badge #${badge.number} (${badge.status})`, 20, y); y+=4;
+          });
+        }
         if(v.signatureBase64) {
           doc.text("✓ Visitor Signature:", 15, y); y+=4;
           try { doc.addImage(v.signatureBase64, 'PNG', 15, y, 45, 18); y += 22; doc.text(`Signed: ${v.signatureDate || ""}`, 15, y); y+=5; } catch(e) { doc.text("Signature unavailable", 15, y); y+=6; }
@@ -373,7 +763,6 @@
       doc.save("superb_visitor_log_with_signatures.pdf");
     }
     
-    // NEW: PDF SUMMARY TABLE (NO SIGNATURES, CLEAN TABLE FORMAT)
     async function exportPDFSummaryTable(data) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "landscape", unit: "mm" });
@@ -382,7 +771,7 @@
       doc.setFontSize(9);
       doc.text(`Generated: ${new Date().toLocaleString()} | Total Visitors: ${data.length}`, 14, 23);
       
-      const tableColumnHeaders = ["Date/Time", "Full Name", "Contact", "Company", "Person to Visit", "Purpose", "Vehicle", "Notes", "Signed Date"];
+      const tableColumnHeaders = ["Date/Time", "Full Name", "Contact", "Company", "Person to Visit", "Purpose", "Vehicle", "Badges", "Notes", "Signed Date"];
       const tableRows = data.map(v => [
         v.timestamp || "",
         v.fullName || "",
@@ -391,6 +780,7 @@
         v.personToVisit || "",
         v.purpose || "",
         v.vehicle || "-",
+        v.contractorCount ? `Badges: ${v.contractorBadges.map(b => `#${b.number}`).join(', ')}` : "-",
         (v.notes || "-").substring(0, 40),
         v.signatureDate || ""
       ]);
@@ -404,9 +794,134 @@
         alternateRowStyles: { fillColor: [248, 245, 235] },
         margin: { left: 10, right: 10 },
         styles: { fontSize: 8, cellPadding: 2 },
-        columnStyles: { 0: { cellWidth: 35 }, 1: { cellWidth: 30 }, 2: { cellWidth: 25 }, 3: { cellWidth: 30 }, 4: { cellWidth: 30 }, 5: { cellWidth: 25 }, 6: { cellWidth: 20 }, 7: { cellWidth: 35 }, 8: { cellWidth: 20 } }
+        columnStyles: { 0: { cellWidth: 30 }, 1: { cellWidth: 25 }, 2: { cellWidth: 25 }, 3: { cellWidth: 25 }, 4: { cellWidth: 25 }, 5: { cellWidth: 20 }, 6: { cellWidth: 20 }, 7: { cellWidth: 30 }, 8: { cellWidth: 25 }, 9: { cellWidth: 20 } }
       });
       doc.save("superb_visitor_summary_table.pdf");
+    }
+    
+    // Badge Return Functions
+    function showBadgeReturnModal() {
+      const modal = document.getElementById('badgeReturnModal');
+      if (modal) {
+        modal.classList.add('active');
+        document.getElementById('returnBadgeNumber').value = '';
+        document.getElementById('returnVisitorName').value = '';
+        document.getElementById('badgeReturnError').innerText = '';
+      }
+    }
+    
+    async function handleBadgeReturn() {
+      const badgeNumber = document.getElementById('returnBadgeNumber')?.value.trim();
+      const visitorName = document.getElementById('returnVisitorName')?.value.trim();
+      const errorDiv = document.getElementById('badgeReturnError');
+      
+      if (!badgeNumber || badgeNumber < 1 || badgeNumber > TOTAL_BADGES) {
+        if(errorDiv) errorDiv.innerText = `Please enter a valid badge number (1-${TOTAL_BADGES})`;
+        return;
+      }
+      
+      const loading = document.getElementById('loadingToast');
+      if(loading) loading.style.display = 'block';
+      
+      try {
+        // Search for active badge in Firestore
+        const badgeQuery = await db.collection(BADGES_COLLECTION)
+          .where('number', '==', badgeNumber)
+          .where('status', '==', 'active')
+          .get();
+        
+        if (badgeQuery.empty) {
+          if(errorDiv) errorDiv.innerText = `Badge #${badgeNumber} is not currently issued or already returned`;
+          if(loading) loading.style.display = 'none';
+          return;
+        }
+        
+        // Update badge status
+        const batch = db.batch();
+        badgeQuery.forEach(doc => {
+          batch.update(doc.ref, {
+            status: 'returned',
+            returnedAt: new Date().toISOString()
+          });
+        });
+        await batch.commit();
+        
+        if(loading) loading.style.display = 'none';
+        alert(`✅ Badge #${badgeNumber} has been returned successfully!`);
+        
+        // Refresh badge pool
+        await initializeBadgePool();
+        
+        const modal = document.getElementById('badgeReturnModal');
+        if(modal) modal.classList.remove('active');
+      } catch (e) {
+        if(loading) loading.style.display = 'none';
+        if(errorDiv) errorDiv.innerText = "Error: " + e.message;
+      }
+    }
+    
+    // Badge Status Modal
+    async function showBadgeStatusModal() {
+      const modal = document.getElementById('badgeStatusModal');
+      const content = document.getElementById('badgeStatusContent');
+      if (!modal || !content) return;
+      
+      // Fetch all badge records
+      const allBadges = await db.collection(BADGES_COLLECTION).get();
+      const badgeMap = {};
+      
+      // Initialize map for all 100 badges
+      for (let i = 1; i <= TOTAL_BADGES; i++) {
+        badgeMap[i] = { status: 'available', records: [] };
+      }
+      
+      // Fill in actual data
+      allBadges.forEach(doc => {
+        const data = doc.data();
+        const badgeNum = parseInt(data.number);
+        if (badgeNum >= 1 && badgeNum <= TOTAL_BADGES) {
+          badgeMap[badgeNum].records.push(data);
+          if (data.status === 'active') {
+            badgeMap[badgeNum].status = 'issued';
+          } else if (data.status === 'returned' && badgeMap[badgeNum].status !== 'issued') {
+            badgeMap[badgeNum].status = 'returned';
+          }
+        }
+      });
+      
+      let html = '<div style="max-height: 400px; overflow-y: auto;">';
+      html += '<table style="width:100%; font-size:0.8rem; border-collapse: collapse;">';
+      html += '<tr><th style="padding:8px; border-bottom:2px solid #d4af37;">Badge #</th><th style="padding:8px; border-bottom:2px solid #d4af37;">Status</th><th style="padding:8px; border-bottom:2px solid #d4af37;">Current Holder</th></tr>';
+      
+      for (let i = 1; i <= TOTAL_BADGES; i++) {
+        const badge = badgeMap[i];
+        let statusColor, statusText, holderText;
+        
+        if (badge.status === 'available') {
+          statusColor = '#22c55e';
+          statusText = 'Available';
+          holderText = '—';
+        } else if (badge.status === 'issued') {
+          statusColor = '#d4af37';
+          statusText = 'Issued';
+          const activeRecord = badge.records.find(r => r.status === 'active');
+          holderText = activeRecord ? activeRecord.visitorName : 'Unknown';
+        } else {
+          statusColor = '#94a3b8';
+          statusText = 'Returned';
+          holderText = 'Returned to pool';
+        }
+        
+        html += `<tr style="border-bottom:1px solid #e2e8f0;">
+          <td style="padding:8px; font-weight:600;">#${i}</td>
+          <td style="padding:8px; color:${statusColor}; font-weight:600;">${statusText}</td>
+          <td style="padding:8px;">${holderText}</td>
+        </tr>`;
+      }
+      
+      html += '</table></div>';
+      content.innerHTML = html;
+      modal.classList.add('active');
     }
     
     let pendingExportType = null;
@@ -419,6 +934,21 @@
       }; 
       document.getElementById('cancelPassModal').onclick=()=>{ modal.classList.remove('active'); }; }
     }
+    
+    // Event Listeners
+    document.getElementById('clearSelectionBtn')?.addEventListener('click', clearBadgeSelection);
+    document.getElementById('badgeReturnBtn')?.addEventListener('click', showBadgeReturnModal);
+    document.getElementById('confirmBadgeReturn')?.addEventListener('click', handleBadgeReturn);
+    document.getElementById('cancelBadgeReturn')?.addEventListener('click', () => {
+      const modal = document.getElementById('badgeReturnModal');
+      if(modal) modal.classList.remove('active');
+    });
+    
+    document.getElementById('badgeStatusBtn')?.addEventListener('click', showBadgeStatusModal);
+    document.getElementById('closeBadgeStatus')?.addEventListener('click', () => {
+      const modal = document.getElementById('badgeStatusModal');
+      if(modal) modal.classList.remove('active');
+    });
     
     document.getElementById('exportCsvBtn')?.addEventListener('click',()=>{ pendingExportType='csv'; showPasswordModal(()=>{ let em=document.getElementById('exportModal'); if(em) em.classList.add('active'); }); });
     document.getElementById('exportPdfBtn')?.addEventListener('click',()=>{ pendingExportType='pdfSignatures'; showPasswordModal(()=>{ let em=document.getElementById('exportModal'); if(em) em.classList.add('active'); }); });
@@ -454,6 +984,8 @@
     document.getElementById('purpose')?.addEventListener('change', updateMaintenanceClauseVisibility);
     let dateInput = document.getElementById('agreementDate'); if(dateInput) dateInput.valueAsDate = new Date();
     
+    // Initialize badge pool on load
+    initializeBadgePool();
     initSignaturePad();
     updateStepUI();
     updateMaintenanceClauseVisibility();
