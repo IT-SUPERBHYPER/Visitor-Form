@@ -160,13 +160,6 @@
       cursor: not-allowed;
       opacity: 0.7;
     }
-    .badge-number-item.returned {
-      background: #e2e8f0;
-      border-color: #94a3b8;
-      color: #475569;
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
     .selected-badges-display {
       margin-top: 1rem;
       padding: 1rem;
@@ -191,11 +184,23 @@
       font-weight: bold;
       margin-left: 4px;
     }
-    .badge-counter-input {
-      width: 80px;
-      text-align: center;
-      font-weight: 700;
-      font-size: 1rem;
+    .badge-legend {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.7rem;
+      color: #64748b;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      display: inline-block;
     }
     @keyframes fadeSlide { from { opacity:0; transform: translateY(10px);} to { opacity:1; transform: translateY(0);} }
     .form-step { animation: fadeSlide 0.3s ease; }
@@ -257,17 +262,22 @@
               </div>
               <div class="badge-stat">
                 <span class="badge-stat-number" id="issuedBadgesCount" style="color: #d4af37;">0</span>
-                <span class="badge-stat-label">Issued</span>
+                <span class="badge-stat-label">Currently Issued</span>
               </div>
               <div class="badge-stat">
-                <span class="badge-stat-number" id="returnedBadgesCount" style="color: #94a3b8;">0</span>
-                <span class="badge-stat-label">Returned</span>
+                <span class="badge-stat-number" id="selectedBadgesCount" style="color: #3b82f6;">0</span>
+                <span class="badge-stat-label">Selected</span>
               </div>
             </div>
           </div>
           
           <div class="badge-selection-area">
-            <label><i class="fas fa-tags"></i> Select Badge Numbers (Click to select/deselect)</label>
+            <label><i class="fas fa-tags"></i> Click to select badges for this visit</label>
+            <div class="badge-legend">
+              <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span> Available</div>
+              <div class="legend-item"><span class="legend-color" style="background:#d4af37;"></span> Currently Issued</div>
+              <div class="legend-item"><span class="legend-color" style="background:#3b82f6; border:2px solid #3b82f6;"></span> Your Selection</div>
+            </div>
             <div class="badge-numbers-grid" id="badgeNumbersGrid">
               <!-- Badge numbers will be rendered here -->
             </div>
@@ -275,7 +285,7 @@
           </div>
           
           <div class="selected-badges-display" id="selectedBadgesDisplay" style="display:none;">
-            <label><i class="fas fa-check-circle"></i> Selected Badges:</label>
+            <label><i class="fas fa-check-circle"></i> Selected Badges for this visit:</label>
             <div id="selectedBadgesContainer"></div>
             <button type="button" class="small-btn" id="clearSelectionBtn" style="margin-top: 0.5rem;">
               <i class="fas fa-times"></i> Clear Selection
@@ -344,23 +354,22 @@
     const API_KEY = '$2a$10$bB1IBj9WSxtFv8ueIC2FVuD60I3VYAsTardsW0hv4AiIU.KY77exu';
     const BIN_ID = '68669b0e8a456b7966babb15';
     const ADMIN_PASSWORD = 'Superb@123';
-    const TOTAL_BADGES = 100; // Your 100 badges pool
+    const TOTAL_BADGES = 100;
 
     let signaturePad = null;
     let signatureHistory = [];
     let currentStep = 1;
-    let selectedBadges = new Set(); // Store selected badge numbers
-    let badgePoolStatus = {}; // Track status of all 100 badges
+    let selectedBadges = new Set();
+    let badgePoolStatus = {}; // Track only: 'available' or 'issued'
     const stepPanels = {1: document.getElementById('step1'), 2: document.getElementById('step2'), 3: document.getElementById('step3'), 4: document.getElementById('step4')};
 
-    // Initialize badge pool (badges 1-100)
     async function initializeBadgePool() {
       // Initialize all badges as available
       for (let i = 1; i <= TOTAL_BADGES; i++) {
         badgePoolStatus[i] = 'available';
       }
       
-      // Fetch currently issued badges from Firestore
+      // Only mark currently active (not returned) badges as 'issued'
       try {
         const issuedBadges = await db.collection(BADGES_COLLECTION)
           .where('status', '==', 'active')
@@ -373,19 +382,7 @@
             badgePoolStatus[badgeNumber] = 'issued';
           }
         });
-        
-        // Also get returned badges to mark them differently
-        const returnedBadges = await db.collection(BADGES_COLLECTION)
-          .where('status', '==', 'returned')
-          .get();
-        
-        returnedBadges.forEach(doc => {
-          const badgeData = doc.data();
-          const badgeNumber = parseInt(badgeData.number);
-          if (badgeNumber >= 1 && badgeNumber <= TOTAL_BADGES) {
-            badgePoolStatus[badgeNumber] = 'returned';
-          }
-        });
+        // Note: Returned badges remain as 'available' since they can be reused
       } catch (error) {
         console.log("Could not fetch badge status:", error);
       }
@@ -395,16 +392,15 @@
     }
 
     function updateBadgeStats() {
-      let available = 0, issued = 0, returned = 0;
+      let available = 0, issued = 0;
       for (let i = 1; i <= TOTAL_BADGES; i++) {
         if (badgePoolStatus[i] === 'available') available++;
         else if (badgePoolStatus[i] === 'issued') issued++;
-        else if (badgePoolStatus[i] === 'returned') returned++;
       }
       
       document.getElementById('availableBadgesCount').textContent = available;
       document.getElementById('issuedBadgesCount').textContent = issued;
-      document.getElementById('returnedBadgesCount').textContent = returned;
+      document.getElementById('selectedBadgesCount').textContent = selectedBadges.size;
     }
 
     function renderBadgeGrid() {
@@ -414,24 +410,22 @@
       grid.innerHTML = '';
       for (let i = 1; i <= TOTAL_BADGES; i++) {
         const badgeDiv = document.createElement('div');
-        badgeDiv.className = `badge-number-item ${badgePoolStatus[i]}`;
+        badgeDiv.className = 'badge-number-item';
         badgeDiv.textContent = i;
         badgeDiv.dataset.badgeNumber = i;
         
         if (badgePoolStatus[i] === 'available') {
+          badgeDiv.classList.add('available');
           // Check if this badge is currently selected
           if (selectedBadges.has(i)) {
             badgeDiv.classList.add('selected');
           }
           badgeDiv.onclick = () => toggleBadgeSelection(i);
+          badgeDiv.title = 'Available - Click to select';
         } else if (badgePoolStatus[i] === 'issued') {
-          badgeDiv.title = 'Currently issued';
-        } else if (badgePoolStatus[i] === 'returned') {
-          badgeDiv.title = 'Returned - available for reissue';
-          // Allow selecting returned badges
-          badgeDiv.onclick = () => toggleBadgeSelection(i);
-          badgeDiv.style.cursor = 'pointer';
-          badgeDiv.style.opacity = '0.7';
+          badgeDiv.classList.add('issued');
+          badgeDiv.title = 'Currently issued to another visitor';
+          badgeDiv.onclick = null; // Can't select issued badges
         }
         
         grid.appendChild(badgeDiv);
@@ -450,6 +444,7 @@
       }
       
       updateSelectedBadgesDisplay();
+      updateBadgeStats();
       renderBadgeGrid();
     }
 
@@ -478,13 +473,14 @@
     function clearBadgeSelection() {
       selectedBadges.clear();
       updateSelectedBadgesDisplay();
+      updateBadgeStats();
       renderBadgeGrid();
     }
 
-    // Make functions globally accessible for onclick handlers
     window.removeBadgeSelection = function(badgeNumber) {
       selectedBadges.delete(badgeNumber);
       updateSelectedBadgesDisplay();
+      updateBadgeStats();
       renderBadgeGrid();
     };
 
@@ -521,7 +517,7 @@
       if(badgePanel) {
         badgePanel.style.display = (purpose === 'Maintenance') ? 'block' : 'none';
         if (purpose === 'Maintenance') {
-          initializeBadgePool(); // Refresh badge pool when maintenance is selected
+          initializeBadgePool();
         }
       }
     }
@@ -556,7 +552,7 @@
         }
         if (selectedBadges.size === 0) {
           let badgeErr = document.getElementById('badgeErrorMsg');
-          if(badgeErr) badgeErr.innerText = "Please select at least one badge from the pool."; 
+          if(badgeErr) badgeErr.innerText = "Please select at least one badge from the available pool."; 
           return false;
         }
       }
@@ -589,7 +585,6 @@
       if(data.purpose === 'Maintenance') {
         data.maintenanceAgreementSigned = true;
         data.maintenanceClausesAccepted = "Safe Work Practices, Public Liability, Designated Exit/Entrance, Report to Reception, Contractor Badge Requirement";
-        // Convert selected badges to array of badge objects
         data.contractorBadges = Array.from(selectedBadges).map(badgeNum => ({
           number: badgeNum.toString(),
           status: 'active',
@@ -613,14 +608,12 @@
       const loading = document.getElementById('loadingToast');
       if(loading) loading.style.display = 'block';
       try {
-        // Save visitor record
         const docRef = await db.collection(COLLECTION).add(data);
         
-        // Save badge records separately for easier tracking
         if (data.contractorBadges && data.contractorBadges.length > 0) {
           const batch = db.batch();
           data.contractorBadges.forEach(badge => {
-            const badgeRef = db.collection(BADGES_COLLECTION).doc(); // Auto-generated ID
+            const badgeRef = db.collection(BADGES_COLLECTION).doc();
             batch.set(badgeRef, {
               ...badge,
               visitorId: docRef.id,
@@ -647,7 +640,6 @@
         
         alert(message);
         
-        // Reset form
         ['fullName','contact','company','personToVisit','vehicle','notes'].forEach(id => { let el = document.getElementById(id); if(el) el.value = ''; });
         let purposeEl = document.getElementById('purpose'); if(purposeEl) purposeEl.value = '';
         let agreeEl = document.getElementById('agreeClauses'); if(agreeEl) agreeEl.checked = false;
@@ -655,7 +647,7 @@
         signatureHistory = [];
         selectedBadges.clear();
         updateSelectedBadgesDisplay();
-        initializeBadgePool(); // Refresh badge pool
+        initializeBadgePool();
         navigateTo(1);
         return true;
       } catch(e) { if(loading) loading.style.display = 'none'; alert("Error: "+e.message); return false; }
@@ -799,7 +791,6 @@
       doc.save("superb_visitor_summary_table.pdf");
     }
     
-    // Badge Return Functions
     function showBadgeReturnModal() {
       const modal = document.getElementById('badgeReturnModal');
       if (modal) {
@@ -824,19 +815,17 @@
       if(loading) loading.style.display = 'block';
       
       try {
-        // Search for active badge in Firestore
         const badgeQuery = await db.collection(BADGES_COLLECTION)
           .where('number', '==', badgeNumber)
           .where('status', '==', 'active')
           .get();
         
         if (badgeQuery.empty) {
-          if(errorDiv) errorDiv.innerText = `Badge #${badgeNumber} is not currently issued or already returned`;
+          if(errorDiv) errorDiv.innerText = `Badge #${badgeNumber} is not currently issued (already returned or never issued)`;
           if(loading) loading.style.display = 'none';
           return;
         }
         
-        // Update badge status
         const batch = db.batch();
         badgeQuery.forEach(doc => {
           batch.update(doc.ref, {
@@ -847,9 +836,8 @@
         await batch.commit();
         
         if(loading) loading.style.display = 'none';
-        alert(`✅ Badge #${badgeNumber} has been returned successfully!`);
+        alert(`✅ Badge #${badgeNumber} has been returned successfully!\nIt is now available for re-use.`);
         
-        // Refresh badge pool
         await initializeBadgePool();
         
         const modal = document.getElementById('badgeReturnModal');
@@ -860,62 +848,57 @@
       }
     }
     
-    // Badge Status Modal
     async function showBadgeStatusModal() {
       const modal = document.getElementById('badgeStatusModal');
       const content = document.getElementById('badgeStatusContent');
       if (!modal || !content) return;
       
-      // Fetch all badge records
       const allBadges = await db.collection(BADGES_COLLECTION).get();
       const badgeMap = {};
       
-      // Initialize map for all 100 badges
       for (let i = 1; i <= TOTAL_BADGES; i++) {
         badgeMap[i] = { status: 'available', records: [] };
       }
       
-      // Fill in actual data
       allBadges.forEach(doc => {
         const data = doc.data();
         const badgeNum = parseInt(data.number);
         if (badgeNum >= 1 && badgeNum <= TOTAL_BADGES) {
           badgeMap[badgeNum].records.push(data);
+          // Only mark as issued if there's an active record
           if (data.status === 'active') {
             badgeMap[badgeNum].status = 'issued';
-          } else if (data.status === 'returned' && badgeMap[badgeNum].status !== 'issued') {
-            badgeMap[badgeNum].status = 'returned';
           }
+          // If all records are 'returned', keep as 'available'
         }
       });
       
       let html = '<div style="max-height: 400px; overflow-y: auto;">';
       html += '<table style="width:100%; font-size:0.8rem; border-collapse: collapse;">';
-      html += '<tr><th style="padding:8px; border-bottom:2px solid #d4af37;">Badge #</th><th style="padding:8px; border-bottom:2px solid #d4af37;">Status</th><th style="padding:8px; border-bottom:2px solid #d4af37;">Current Holder</th></tr>';
+      html += '<tr><th style="padding:8px; border-bottom:2px solid #d4af37;">Badge #</th><th style="padding:8px; border-bottom:2px solid #d4af37;">Status</th><th style="padding:8px; border-bottom:2px solid #d4af37;">Current Holder</th><th style="padding:8px; border-bottom:2px solid #d4af37;">History</th></tr>';
       
       for (let i = 1; i <= TOTAL_BADGES; i++) {
         const badge = badgeMap[i];
-        let statusColor, statusText, holderText;
+        let statusColor, statusText, holderText, historyText;
         
         if (badge.status === 'available') {
           statusColor = '#22c55e';
           statusText = 'Available';
           holderText = '—';
-        } else if (badge.status === 'issued') {
+          historyText = badge.records.length > 0 ? `Used ${badge.records.length} time(s)` : 'Never used';
+        } else {
           statusColor = '#d4af37';
           statusText = 'Issued';
           const activeRecord = badge.records.find(r => r.status === 'active');
           holderText = activeRecord ? activeRecord.visitorName : 'Unknown';
-        } else {
-          statusColor = '#94a3b8';
-          statusText = 'Returned';
-          holderText = 'Returned to pool';
+          historyText = `Used ${badge.records.length} time(s)`;
         }
         
         html += `<tr style="border-bottom:1px solid #e2e8f0;">
           <td style="padding:8px; font-weight:600;">#${i}</td>
           <td style="padding:8px; color:${statusColor}; font-weight:600;">${statusText}</td>
           <td style="padding:8px;">${holderText}</td>
+          <td style="padding:8px; font-size:0.7rem; color:#64748b;">${historyText}</td>
         </tr>`;
       }
       
@@ -935,7 +918,6 @@
       document.getElementById('cancelPassModal').onclick=()=>{ modal.classList.remove('active'); }; }
     }
     
-    // Event Listeners
     document.getElementById('clearSelectionBtn')?.addEventListener('click', clearBadgeSelection);
     document.getElementById('badgeReturnBtn')?.addEventListener('click', showBadgeReturnModal);
     document.getElementById('confirmBadgeReturn')?.addEventListener('click', handleBadgeReturn);
@@ -984,7 +966,6 @@
     document.getElementById('purpose')?.addEventListener('change', updateMaintenanceClauseVisibility);
     let dateInput = document.getElementById('agreementDate'); if(dateInput) dateInput.valueAsDate = new Date();
     
-    // Initialize badge pool on load
     initializeBadgePool();
     initSignaturePad();
     updateStepUI();
